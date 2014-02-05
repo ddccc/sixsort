@@ -148,7 +148,7 @@ int main (int argc, char *argv[]) {
   // validateQsort();
   // validateBentley();
   // Measure the sorting time of an algorithm
-     // timeTest();
+     timeTest();
   // Compare the outputs of two sorting algorithms
      // validateXYZ(); // must provide an other algorithm XYZ
      // ... and uncomment validateXYZ ...
@@ -408,7 +408,8 @@ void timeTest() {
   printf("timeTest() of sixsort \n");
   int algTime, T;
   int seed;
-  int seedLimit = 10;
+  // int seedLimit = 10;
+  int seedLimit = 3;
   int z;
   int siz = 1024 * 1024 * 16;
   // construct array
@@ -423,7 +424,8 @@ void timeTest() {
   // warm up the process
   fillarray(A, siz, 666); 
   int sumTimes = 0;
-  for (z = 0; z < 3; z++) { // repeat to check stability
+  int reps = 3;
+  for (z = 0; z < reps; z++) { // repeat to check stability
     algTime = 0;
     // measure the array fill time
     int TFill = clock();
@@ -443,14 +445,15 @@ void timeTest() {
       // for ( k = 0; k < siz; k++ ) A[k] = 0;
       // for ( k = 0; k < siz; k++ ) A[k] = k%5;
       // for ( k = 0; k < siz; k++ ) A[k] = siz-k;
+
       sixsort(A, siz, compareIntVal);  
     }
     // ... and subtract the fill time to obtain the sort time
-    algTime = clock() - T - TFill;
+    algTime = (clock() - T - TFill)/ seedLimit;
     printf("algTime: %d \n", algTime);
     sumTimes = sumTimes + algTime;
   }
-  printf("%s %d %s", "sumTimes: ", sumTimes, "\n");
+  printf("%s %d %s", "sumTimes: ", (sumTimes/reps), "\n");
   // free array
   for (i = 0; i < siz; i++) {
     free(A[i]); 
@@ -490,7 +493,7 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
     // warm up the process
     for (seed = 0; seed < seedLimit; seed++) 
       fillarray(A, siz, seed);
-    for (z = 0; z < 3; z++) { // repeat to check stability
+    for (z = 0; z < 5; z++) { // repeat to check stability
       alg1Time = 0; alg2Time = 0;
       int TFill = clock();
       for (seed = 0; seed < seedLimit; seed++) 
@@ -539,7 +542,8 @@ void compareAlgorithms2(char *label, int siz, int seedLimit,
 
 void compareAlgorithms(char *label, void (*alg1)(), void (*alg2)() ) {
   // compareAlgorithms0(label, 1024, 32 * 1024, alg1, alg2);
-  compareAlgorithms0(label, 16 * 1024 * 1024, 4, alg1, alg2);
+  // compareAlgorithms0(label, 16 * 1024 * 1024, 4, alg1, alg2);
+  compareAlgorithms0(label, 1024 * 1024, 32, alg1, alg2);
 } // end compareAlgorithms
 
 
@@ -776,27 +780,13 @@ loop:	SWAPINIT(a, es);
 } // end of bentley
 
 // Bentley test-bench content generators
+/*
 void reverse();
 void reverseFront();
 void reverseBack();
 void tweakSort();
 void dither();
-void sawtooth(void **A, int n, int m, int tweak) {
-  // int *A = malloc (sizeof(int) * n);
-  struct intval *pi;
-  int k;
-  for (k = 0; k < n; k++) {
-    pi = (struct intval *)A[k];
-    pi->val = k % m; 
-  }
-  if ( tweak <= 0 ) return;
-  if ( tweak == 1 ) { reverse(A, n); return; }
-  if ( tweak == 2 ) { reverseFront(A, n); return; }
-  if ( tweak == 3 ) { reverseBack(A, n); return; }
-  if ( tweak == 4 ) { tweakSort(A, n); return; }
-  dither(A, n);
-} // end sawtooth
-
+*/
 void reverse2();
 void reverse(void **A, int n) {
   reverse2(A, 0, n-1);
@@ -813,9 +803,6 @@ void reverseFront(void **A, int n) {
 void reverseBack(void **A, int n) {
   reverse2(A, n/2, n-1);
 } // end reverseBack
-
-void **A;
-int (*compareXY)();
 
 void tweakSort(void **AA, int n) {
   /*
@@ -834,6 +821,22 @@ void dither(void **A, int n) {
     pi->val = pi->val + (k % 5);
   }
 } // end dither
+
+void sawtooth(void **A, int n, int m, int tweak) {
+  // int *A = malloc (sizeof(int) * n);
+  struct intval *pi;
+  int k;
+  for (k = 0; k < n; k++) {
+    pi = (struct intval *)A[k];
+    pi->val = k % m; 
+  }
+  if ( tweak <= 0 ) return;
+  if ( tweak == 1 ) { reverse(A, n); return; }
+  if ( tweak == 2 ) { reverseFront(A, n); return; }
+  if ( tweak == 3 ) { reverseBack(A, n); return; }
+  if ( tweak == 4 ) { tweakSort(A, n); return; }
+  dither(A, n);
+} // end sawtooth
 
 void rand2(void **A, int n, int m, int tweak, int seed) {
   srand(seed);
@@ -907,6 +910,28 @@ void shuffle(void **A, int n, int m, int tweak, int seed) {
   dither(A, n);
 } // end shuffle
 
+void slopes(void **A, int n, int m, int tweak) {
+  int k, i, b, ak;
+  i = k = b = 0; ak = 1;
+  struct intval *pi;
+  while ( k < n ) {
+    if (1000000 < ak) ak = k; else
+    if (ak < -1000000) ak = -k;
+    // A[k] = -(ak + b); ak = A[k];
+    pi = (struct intval *)A[k];
+    ak = -(ak + b);
+    pi->val = ak;
+    k++; i++; b++;
+    if ( 11 == b ) { b = 0; }
+    if ( m == i ) { ak = ak*2; i = 0; }
+  }
+  if ( tweak <= 0 ) return;
+  if ( tweak == 1 ) { reverse(A, n); return; }
+  if ( tweak == 2 ) { reverseFront(A, n); return; }
+  if ( tweak == 3 ) { reverseBack(A, n); return; }
+  if ( tweak == 4 ) { tweakSort(A, n); return; }
+  dither(A, n);
+} // end slopes
 
 // Using the Bentley test-bench distributions to validate SixSort;
 // heapsort is the trusted algorithm.
