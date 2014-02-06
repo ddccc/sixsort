@@ -16,19 +16,6 @@ void dflgm(int N, int M, int pivotx, void (*cut)(), int depthLimit) {
   register int r; // comparison output 
   // int z; // for tracing
 
-  if ( depthLimit <= 0 ) { // avoid quadradic explosion
-    heapc(A, N, M);
-    return;
-  }
-
-  int L = M - N;
-  // delegated small segments
-  // if ( L < cut3xLimit ) {
-  if ( L < 100 ) {
-    quicksort0c(N, M, depthLimit);
-    return;
-  }
-
   i = N; j = M; lw = pivotx-1; up = pivotx+1;
     /*
       |---)-----(----)-------(----|
