@@ -3,6 +3,8 @@
 // (C) OntoOO/ Dennis de Champeaux
 
 void cut2c();
+// cut2 is used as a best in class quicksort implementation 
+// with a defense against quadratic behavior due to duplicates
 // cut2 is a support function to call up the workhorse cut2c
 void cut2(int N, int M) { 
   // printf("cut2 %d %d \n", N, M);
@@ -15,11 +17,9 @@ void cut2(int N, int M) {
   cut2c(N, M, depthLimit);
 } // end cut2
 
-// Cut2 does 2-partitioning with one pivot; cut2 is NOT used
+// Cut2c does 2-partitioning with one pivot; cut2 is NOT used
 // by SixSort and neither by FiveSort.  It is included for comparisons. 
-// Cut2 invokes cut3duplicates when duplicates are found.
-// cut2 is used as a best in class quicksort implementation 
-// {with a defense against quadratic behavior due to duplicates}
+// Cut2c invokes dflgm when duplicates are found.
 void cut2c(int N, int M, int depthLimit) {
   int L;
   Start:
@@ -38,7 +38,7 @@ void cut2c(int N, int M, int depthLimit) {
         int sixth = (M - N + 1) / 6;
         int e1 = N  + sixth;
         int e5 = M - sixth;
-        int e3 = (N+M) / 2; // The midpoint
+        int e3 = (N+M) / 2; // the midpoint
         int e4 = e3 + sixth;
         int e2 = e3 - sixth;
 
@@ -96,7 +96,7 @@ void cut2c(int N, int M, int depthLimit) {
 	// if ( T <= AJ ) goto Right;
 	// if ( compareXY(T, AJ) <= 0 ) goto Right;
 	while ( compareXY(T, A[--J]) <= 0 ); AJ = A[J];
-	if ( I < J ) {
+	if ( I < J ) { // swap
 	  A[I] = AJ; A[J] = AI;
 	  goto Left;
 	}
@@ -109,4 +109,4 @@ void cut2c(int N, int M, int depthLimit) {
 	cut2c(I, M, depthLimit);
 	M = J;
 	goto Start;
-} // (*  OF cut2; *) ... the brackets reminds that this was Pascal code
+} // (*  OF cut2; *) the brackets remind that this was once Pascal code
