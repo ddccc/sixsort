@@ -13,7 +13,7 @@ void cut2(int N, int M) {
     quicksort0(N, M);
     return;
   }
-  int depthLimit = 2 * floor(log(L));
+  int depthLimit = 2.5 * floor(log(L));
   cut2c(N, M, depthLimit);
 } // end cut2
 
@@ -35,7 +35,7 @@ void cut2c(int N, int M, int depthLimit) {
   depthLimit--;
   
   // Check for duplicates
-        int sixth = (M - N + 1) / 6;
+        int sixth = (L + 1) / 6;
         int e1 = N  + sixth;
         int e5 = M - sixth;
         int e3 = (N+M) / 2; // the midpoint

@@ -65,7 +65,7 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 const int cut2Limit = 127;
 const int cut3Limit = 250;
 const int cut4Limit = 375; 
-const int probeParamCut4 = 100000;
+const int probeParamCut4 = 1000000;
 
 char* expiration = "*** License for sixsort has expired ...\n";
 
@@ -96,7 +96,7 @@ void cut4P(int N, int M) {
     cut2(N, M); 
     return; 
   }
-  int depthLimit = 2 * floor(log(L));
+  int depthLimit = 2.5 * floor(log(L));
   cut4Pc(N, M, depthLimit);
 } // end cut4P
 
@@ -117,7 +117,7 @@ void cut4Pc(int N, int M, int depthLimit)
   register void *maxl, *middle, *minr; // pivots for left/ middle / right regions
 
   int probeLng = L/ probeParamCut4;
-  if ( probeLng < 28 ) probeLng = 28; // quite short indeed
+  if ( probeLng < 20 ) probeLng = 20; // quite short indeed
   int halfSegmentLng = probeLng/2;
   int N1 = N + L/2 - halfSegmentLng;
   int M1 = N1 + probeLng - 1;
@@ -1496,7 +1496,7 @@ void sixsort(void **AA, int size,
   NUMTHREADS = numberOfThreads;
   // printf("Entering sortArray\n");
   ll = newStack();
-  int depthLimit = 2 * floor(log(size + 1));
+  int depthLimit = 2.5 * floor(log(size + 1));
   struct task *t = newTask(0, size-1, depthLimit);
   addTaskSynchronized(ll, t);
 

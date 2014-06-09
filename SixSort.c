@@ -60,7 +60,7 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 const int cut2Limit = 127;
 const int cut3Limit = 250; 
 const int cut4Limit = 375; 
-const int probeParamCut4 = 100000;
+const int probeParamCut4 = 1000000;
 
 char* expiration = "*** License for sixsort has expired ...\n";
 
@@ -81,7 +81,7 @@ void cut4(int N, int M) {
   // printf("cut4 %d %d \n", N, M);
   int L = M - N; 
   // cut4c(N, M, 0); return; // for testing heapsort
-  int depthLimit = 2 * floor(log(L));
+  int depthLimit = 2.5 * floor(log(L));
   cut4c(N, M, depthLimit);
 } // end cut4
 
@@ -105,7 +105,7 @@ void cut4c(int N, int M, int depthLimit)
 
   
   int probeLng = L/ probeParamCut4;
-  if ( probeLng < 28 ) probeLng = 28; // quite short indeed
+  if ( probeLng < 20 ) probeLng = 20; // quite short indeed
   int halfSegmentLng = probeLng/2;
   int N1 = N + L/2 - halfSegmentLng;
   int M1 = N1 + probeLng - 1;
