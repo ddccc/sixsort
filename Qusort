@@ -23,7 +23,7 @@ void quicksort0(int N, int M) {
     insertionsort(N, M);
     return;
   }
-  int depthLimit = 2 * floor(log(L));
+  int depthLimit = 2.5 * floor(log(L));
   quicksort0c(N, M, depthLimit);
 } // end quicksort0
 
