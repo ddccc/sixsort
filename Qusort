@@ -56,14 +56,14 @@ void quicksort0c(int N, int M, int depthLimit) {
 	 1/4% on uniform input.  If you suspect that duplicates
 	 causing quadratic deterioration are not caught higher-up by cut3
 	 you may want to experiment with this check::::
-      if ( L < 100 ) { // check for duplicates
+      if ( 100 < L ) { // check for duplicates
 	int duplicate = -1;
 	if ( compareXY(A[pn], A[pm]) == 0 ) { duplicate = pn; } else
 	if ( compareXY(A[pn], A[p0]) == 0 ) { duplicate = p0; } else
 	if ( compareXY(A[pm], A[p0]) == 0 ) { duplicate = p0; };
 	if ( 0 <= duplicate ) {
 	  void quicksort0();
-	  dflgm(N, M, duplicate, quicksort0, depthLimit);
+	  dflgm(N, M, duplicate, quicksort0c, depthLimit);
 	  return;
 	}
       }
