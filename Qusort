@@ -52,9 +52,9 @@ void quicksort0c(int N, int M, int depthLimit) {
       pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
       p0 = med(A, p0 - d, p0, p0 + d, compareXY);
       pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
-      /* Activation of the check for duplicates gives a slow down of 
-	 1/4% on uniform input.  If you suspect that duplicates
-	 causing quadratic deterioration are not caught higher-up by cut3
+      /* Activation of the check for duplicates gives a slow down 
+	 on uniform input.  If you suspect that duplicates
+	 causing quadratic deterioration are not caught higher-up
 	 you may want to experiment with this check::::
       if ( 100 < L ) { // check for duplicates
 	int duplicate = -1;
@@ -62,7 +62,6 @@ void quicksort0c(int N, int M, int depthLimit) {
 	if ( compareXY(A[pn], A[p0]) == 0 ) { duplicate = p0; } else
 	if ( compareXY(A[pm], A[p0]) == 0 ) { duplicate = p0; };
 	if ( 0 <= duplicate ) {
-	  void quicksort0();
 	  dflgm(N, M, duplicate, quicksort0c, depthLimit);
 	  return;
 	}
