@@ -67,11 +67,14 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include <stddef.h>
 #include <stdlib.h>
 
+// #include "C2fsort.c"
+// #include "C4.c"
+
 // To avoid compiler warnings:::
-void callQuicksort0(void **AA, int size, int (*compar ) ());
-void callCut2(void **AA, int size, int (*compar ) ());
-void callQsort(void **A, int size, int (*compar ) ());
-void callHeapsort(void **A, int size, int (*compar ) ());
+void callQuicksort0(void **AA, int size, int (*compar )());
+void callCut2(void **AA, int size, int (*compar )());
+void callQsort(void **A, int size, int (*compar )());
+void callHeapsort(void **A, int size, int (*compar )());
 void callBentley();
 void callLQ();
 void callChensort();
@@ -83,12 +86,13 @@ void compareQsortAgainstQuicksort0();
 void compareQsortAgainstCut2();
 void compareQuicksort0AgainstSixsort();
 void compareSixsortAgainstXYZ();
-void quicksort0(int N, int M);
-void cut2(int N, int M);
-void cut4(int N, int M);
-void sixsort(void **AA, int size, 
+void quicksort0(void **A, int N, int M, int (*compar )());
+void cut2(void **A, int N, int M, int (*compar )());
+void cut2f(void **A, int N, int M, int (*compar )());
+void cut4(void **A, int N, int M, int (*compar )());
+void sixsort(void **A, int size, 
 	      int (*compar ) (const void *, const void * ));
-void heapSort(void **a, int count);
+void heapSort(void **a, int count, int (*compar )());
 void testBentley();
 void testQsort();
 void testQuicksort0();
@@ -101,11 +105,12 @@ void validateBentley();
 void validateQsort();
 int clock();
 void validateSixSortBT();
+void compareBentleyAgainstSixsort(); // on Bentley test bench
 
 
 // Here global entities used throughout
-int (*compareXY)();
-void **A;
+// int (*compareXY)();
+// void **A;
 
 // Example of objects that can be used to populate an array to be sorted:
   // To obtain the int field from X: ((struct intval *) X)->val
@@ -166,9 +171,10 @@ int main (int argc, char *argv[]) {
      // compareQsortAgainstQuicksort0(); 
      // compareQsortAgainstCut2(); 
      compareBentleyAgainstSixSort();
-     compareLQAgainstSixSort();
-     compareChenSortAgainstSixSort();
+     // compareLQAgainstSixSort();
+     // compareChenSortAgainstSixSort();
      // validateSixSortBT();
+     // compareBentleyAgainstSixsort(); // on Bentley test bench
      return 0;
 } // end of main
 
@@ -183,12 +189,13 @@ void *myMalloc(char* location, int size) {
 
 // fillarray assigns random values to the int-field of our objects
 void fillarray(void **A, int lng, int startv) {
+  const int range = 1024*1024*32;
   int i;
   srand(startv);
   struct intval *pi;
   for ( i = 0; i < lng; i++) {
     pi = (struct intval *)A[i];
-    pi->val = rand(); 
+    pi->val = rand()%range; 
   }
 } // end of fillarray
 
@@ -207,7 +214,7 @@ void check(void **A, int N, int M) {
       cnt++;
     }
   }
-  printf("check # errors: %d", cnt);
+  printf("check # errors: %d\n", cnt);
 } // end check
 
 
@@ -248,6 +255,7 @@ void testAlgorithm2(char* label, int siz, void (*alg1)() ) {
 // like testAlgorithm0 but the size of array is preset inside testAlgorithm
 void testAlgorithm(char* label, void (*alg1)() ) {
   testAlgorithm0(label, 1024*1024, alg1);
+  // testAlgorithm0(label, 1024, alg1);
 } // end testAlgorithm0
 
 // /* Example: use of testAlgorithm
@@ -323,7 +331,7 @@ void validateAlgorithm0(char* label, int siz, void (*alg1)(), void (*alg2)() ) {
 
 // Like validateAlgorithm0 but with fixed array size
 void validateAlgorithm(char* label, void (*alg1)(), void (*alg2)() ) {
-  validateAlgorithm0(label, 1024 * 1024, alg1, alg2);
+  validateAlgorithm0(label, 1024 * 1024 * 16, alg1, alg2);
 } // end validateAlgorithm
 
 /* Example:: replace XYZ by what you want to validate
@@ -336,8 +344,7 @@ void validateXYZ() {
 
 void callHeapsort(void **A, int size, 
 	 int (*compar ) (const void *, const void * ) ) {
-  compareXY = compar;
-  heapSort(A, size);
+  heapSort(A, size, compar);
 } // end callHeapsort
 
 void validateHeapSort() {
@@ -472,11 +479,9 @@ void timeTest() {
 
 // callCut2 is not used by sixsort; it is employed by UseSixSort.c
 // for cut2 testing. 
-void callCut2(void **AA, int size, 
+void callCut2(void **A, int size, 
 	int (*compar ) (const void *, const void * ) ) {
-  A = AA;
-  compareXY = compar;
-  cut2(0, size-1);
+  cut2f(A, 0, size-1, compar);
 } // end callCut2
 
 // Report the speed fraction of two algorithms on a range of array sizes
@@ -547,6 +552,8 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
     free(A);
     siz = siz * 2;
     seedLimit = seedLimit / 2;
+    // siz = siz * 4;
+    // seedLimit = seedLimit / 4;
   }
 } // end compareAlgorithms00
 
@@ -563,9 +570,9 @@ void compareAlgorithms2(char *label, int siz, int seedLimit,
  } // end compareAlgorithms2
 
 void compareAlgorithms(char *label, void (*alg1)(), void (*alg2)() ) {
-  // compareAlgorithms0(label, 1024, 32 * 1024, alg1, alg2);
+  compareAlgorithms0(label, 1024, 32 * 1024, alg1, alg2);
   // compareAlgorithms0(label, 16 * 1024 * 1024, 4, alg1, alg2);
-  compareAlgorithms0(label, 1024 * 1024, 32, alg1, alg2);
+  // compareAlgorithms0(label, 1024 * 1024, 32, alg1, alg2);
 } // end compareAlgorithms
 
 
@@ -585,14 +592,9 @@ void compareCut2AgainstSixsort() {
   compareAlgorithms("Compare cut2 vs sixsort", callCut2, sixsort);
 } // end compareCut2AgainstSixsort 
 
-void **A;
-int (*compareXY)();
-
-void callQuicksort0(void **AA, int size, 
+void callQuicksort0(void **A, int size, 
 	int (*compar ) (const void *, const void * ) ) {
-  A = AA;
-  compareXY = compar;
-  quicksort0(0, size-1);
+  quicksort0(A, 0, size-1, compar);
 } // end callQuicksort0
 
 void compareQsortAgainstQuicksort0() {
@@ -1570,3 +1572,115 @@ void validateSixSortBT() {
     seedLimit = seedLimit / 2;
   }
 } // end validateSixSortBT
+
+void compareBentleyAgainstSixsort() {
+  printf("Entering compareBentleyAgainstCut3 Sawtooth ........\n");
+  // printf("Entering compareBentleyAgainstCut3 Rand2 ........\n");
+  // printf("Entering compareBentleyAgainstCut3 Plateau ........\n");
+  // printf("Entering compareBentleyAgainstCut3 Shuffle ........\n");
+  // printf("Entering compareBentleygAainstCut3 Stagger ........\n");
+  int bentleyTime, cut3Time, T;
+  int seed = 666;
+  int z;
+  // int siz = 1024;
+  int siz = 1024*1024;
+  // int limit = 1024 * 1024 * 16 + 1;
+  // int seedLimit = 32 * 1024;
+  int limit = siz + 1;
+  // int seedLimit = 32;
+  int seedLimit = 1;
+  float frac;
+  while (siz <= limit) {
+    printf("%s %d %s %d %s", "siz: ", siz, " seedLimit: ", seedLimit, "\n");
+    // int A[siz];
+    // void **A = malloc (sizeof(int) * siz);
+    // create array
+    struct intval *pi;
+    void **A = myMalloc("compareBentleyAgainstFivesort 1", sizeof(pi) * siz);
+    int i;
+    for (i = 0; i < siz; i++) {
+      pi = myMalloc("compareBentleyAgainstFivesort 2", sizeof (struct intval));
+      A[i] = pi;
+    };
+
+    // warm up the process
+    fillarray(A, siz, seed);
+    int TFill, m, tweak;
+    int bentleyCnt, cut3Cnt; // , bentleyCntx, cut3Cntx;
+    int sumQsortB, sumCut3; // , sumQsortBx, sumCut3x;
+    // for (z = 0; z < 3; z++) { // repeat to check stability
+    for (z = 0; z < 1; z++) { // repeat to check stability
+      bentleyCnt = cut3Cnt = sumQsortB = sumCut3 = 0;
+      // bentleyCntx = cut3Cntx = sumQsortBx = sumCut3x = 0;
+      for (m = 1; m < 2 * siz; m = m * 2) {
+      // m = 1024 * 1024; {
+      	for (tweak = 0; tweak <= 5; tweak++ ) {
+	  if (4 == tweak) continue; // due to bias 
+	  bentleyTime = 0; cut3Time = 0;
+	  TFill = clock();
+	  for (seed = 0; seed < seedLimit; seed++) 
+	    // sawtooth(A, siz, m, tweak);
+	    // rand2(A, siz, m, tweak, seed);
+	    // plateau(A, siz, m, tweak); // not used
+	    // shuffle(A, siz, m, tweak, seed); // not used
+	    // stagger(A, siz, m, tweak);
+	    slopes(A, siz, m, tweak);
+	  TFill = clock() - TFill;
+	  T = clock();
+	  for (seed = 0; seed < seedLimit; seed++) { 
+	    // sawtooth(A, siz, m, tweak);
+	    // rand2(A, siz, m, tweak, seed);
+	    // plateau(A, siz, m, tweak); // not used
+	    // shuffle(A, siz, m, tweak, seed);  // not used
+	    // stagger(A, siz, m, tweak);
+	    slopes(A, siz, m, tweak);
+	    // callBentley(A, 0, siz-1); 
+	    callCut2(A, siz, compareIntVal); 
+	    // callQuicksort0(B, siz, compareIntVal); 
+	  }
+	  bentleyTime = bentleyTime + clock() - T - TFill;
+	  sumQsortB += bentleyTime;
+	  // if ( 4 != tweak ) sumQsortBx += bentleyTime;
+	  T = clock();
+	  for (seed = 0; seed < seedLimit; seed++) { 
+	    // sawtooth(A, siz, m, tweak);
+	    // rand2(A, siz, m, tweak, seed);
+	    // plateau(A, siz, m, tweak); // not used
+	    // shuffle(A, siz, m, tweak, seed); // not used
+	    // stagger(A, siz, m, tweak);
+	    slopes(A, siz, m, tweak);
+	    sixsort(A, siz, compareIntVal);
+	  }
+	  cut3Time = cut3Time + clock() - T - TFill;
+	  sumCut3 += cut3Time;
+	  // if ( 4 != tweak ) sumCut3x += cut3Time;
+	  printf("size: %d m: %d tweak: %d ", siz, m, tweak);
+	  printf("bentleyTime: %d ", bentleyTime);
+	  printf("Cut3Time: %d ", cut3Time);
+	  frac = 0;
+	  if ( bentleyTime != 0 ) frac = cut3Time / ( 1.0 * bentleyTime );
+	  printf("frac: %f \n", frac);
+	  if ( bentleyTime < cut3Time ) bentleyCnt++;
+	  else cut3Cnt++;
+	}
+	printf("sumQsortB:   %i sumCut3:  %i frac: %f", 
+	       sumQsortB, sumCut3, (sumCut3/(1.0 * sumQsortB)));
+	printf(" bentleyCnt:  %i cut3Cnt:  %i\n", bentleyCnt, cut3Cnt);
+      }
+      frac = 0;
+      if ( sumQsortB != 0 ) frac = sumCut3 / ( 1.0 * sumQsortB );
+      printf("Measurements:\n");
+      printf("sumQsortB:   %i sumCut3:  %i frac: %f", 
+	     sumQsortB, sumCut3, (sumCut3/(1.0 * sumQsortB)));
+      printf(" bentleyCnt:  %i cut3Cnt:  %i\n", bentleyCnt, cut3Cnt);
+      // printf("sumQsortBx:  %i sumCut3x: %i", sumQsortBx, sumCut3x);
+      // printf(" bentleyCntx: %i cut3Cntx: %i\n", bentleyCntx, cut3Cntx);
+    }
+    free(A);
+    // siz = siz * 2;
+    // seedLimit = seedLimit / 2;
+    siz = siz * 4;
+    seedLimit = seedLimit / 4;
+  }
+
+} // end compareBentleyAgainstSixsort

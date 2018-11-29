@@ -19,7 +19,7 @@ void quicksort0(int N, int M) {
   int L = M - N;
   if ( L <= 0 ) return;
   // printf("quicksort0 %d %d \n", N, M);
-  if ( L <= 10 ) { 
+  if ( L <= 7 ) { 
     insertionsort(N, M);
     return;
   }
@@ -27,13 +27,15 @@ void quicksort0(int N, int M) {
   quicksort0c(N, M, depthLimit);
 } // end quicksort0
 
+void dflgm();
+
 // Quicksort equipped with a defense against quadratic explosion;
 // calling heapsort if depthlimit exhausted
 void quicksort0c(int N, int M, int depthLimit) {
   // printf("Enter quicksort0c N: %d M: %d %d\n", N, M, depthLimit);
   while ( N < M ) {
     int L = M - N;
-    if ( L <= 10 ) {
+    if ( L <= 7 ) {
       insertionsort(N, M);
       return;
     }
@@ -42,33 +44,26 @@ void quicksort0c(int N, int M, int depthLimit) {
       return;
     }
     depthLimit--;
-    // 10 < L
-    // grab median of 3 or 9 to get a good pivot
+
+    // 7 < L
+    int p0 = N + (L>>1); // N + L/2;
     int pn = N;
     int pm = M;
-    int p0 = (pn+pm)/2;
-    if ( 40 < L ) { // do median of 9
-      int d = L/8;
+    if ( 40 < L ) {
+      int d = L>>3; // L/8;
       pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
       p0 = med(A, p0 - d, p0, p0 + d, compareXY);
       pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
-      /* Activation of the check for duplicates gives a slow down 
-	 on uniform input.  If you suspect that duplicates
-	 causing quadratic deterioration are not caught higher-up
-	 you may want to experiment with this check::::
-      if ( 100 < L ) { // check for duplicates
-	int duplicate = -1;
-	if ( compareXY(A[pn], A[pm]) == 0 ) { duplicate = pn; } else
-	if ( compareXY(A[pn], A[p0]) == 0 ) { duplicate = p0; } else
-	if ( compareXY(A[pm], A[p0]) == 0 ) { duplicate = p0; };
-	if ( 0 <= duplicate ) {
-	  dflgm(N, M, duplicate, quicksort0c, depthLimit);
-	  return;
-	}
-      }
-      */
+ 
     }
-    p0 = med(A, pn, p0, pm, compareXY); // p0 is index to 'best' pivot ...
+    p0 = med(A, pn, p0, pm, compareXY);
+    /* optional check when inputs have many equal elements
+    if ( compareXY(A[N], A[M]) == 0 ) {
+      dflgm(N, M, p0, quicksort0c, depthLimit);
+      return;
+    } */
+    // p0 is index to 'best' pivot ...
+    
     iswap(N, p0, A); // ... and is put in first position
 
     register void *p = A[N]; // pivot
@@ -97,14 +92,14 @@ void quicksort0c(int N, int M, int depthLimit) {
 
     while ( i < j ) {
       /*
-	  |-------o---------------[--------|
+	  |-------o---------------(--------|
           N       i               j        M
 	  N <= i < j <= M
           N <= k < i -> A[k] <= p    
           N < j < k <= M -> p < A[k]
 	  A[N] <= p
           N < i -> p < A[i]
-          p + A[N,i) + A(i,M] is a permutation of the input array
+          p + A[N,i) + A(i,j] + A(j,M] is a permutation of the input array
       */
       aj = A[j];
       while ( compareXY(p, aj) < 0 ) { 

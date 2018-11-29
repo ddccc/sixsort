@@ -71,7 +71,7 @@ void insertionsort(int N, int M) {
     ai = A[s-12];
     if ( compareXY(ai, next) <= 0 ) { A[s-11] = next; continue; }
     fprintf(stderr, "SixSort/ insertionsort() ");
-    fprintf(stderr, "N: %d M %d s: s\n", N, M, s);
+    fprintf(stderr, "N: %d M %d s: %i\n", N, M, s);
     exit(1);
   }
   return;
