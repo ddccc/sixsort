@@ -10,18 +10,18 @@ void iswap(int p, int q, void **A) {
 } // end of iswap
 
 void heapSort();
-void heapc(void **A, int N, int M) {
+void heapc(void **A, int N, int M, int (*compare)()) {
   // printf("heapc: %d %d\n", N, M);
   if ( M <= N ) return;
-  heapSort(&A[N], M-N+1);
+  heapSort(&A[N], M-N+1, compare);
 } // end heapc
 
 void heapify();
 void siftDown();
-void heapSort(void **a, int count) {
+void heapSort(void **a, int count, int (*compare)()) {
   // input:  an unordered array a of length count
   // first place a in max-heap order
-  heapify(a, count);
+  heapify(a, count, compare);
   // in languages with zero-based arrays the children are 2*i+1 and 2*i+2
   int end = count-1; 
   while ( end > 0 ) {
@@ -33,22 +33,22 @@ void heapSort(void **a, int count) {
     // previous max value will stay in its proper placement) 
     end = end - 1;
     // (put the heap back in max-heap order)
-    siftDown(a, 0, end);
+    siftDown(a, 0, end, compare);
   }
 } // end heapSort
          
-void heapify(void **a, int count) {
+void heapify(void **a, int count, int (*compare)()) {
   // (start is assigned the index in a of the last parent node)
   int start = (count - 2) / 2;
   while ( 0 <= start ) {
     // (sift down the node at index start to the proper place such 
     // that all nodes below the start index are in heap order)
-    siftDown(a, start, count-1);
+    siftDown(a, start, count-1, compare);
     start = start - 1;
   } // (after sifting down the root all nodes/elements are in heap order)
 } // end heapify
  
-void siftDown(void **a, int start, int end) {
+void siftDown(void **a, int start, int end, int (*compare)()) {
   // input:  end represents the limit of how far down the heap to sift.
   int root = start;
   int child, swapi;
@@ -58,12 +58,12 @@ void siftDown(void **a, int start, int end) {
     swapi = root; // (keeps track of child to swap with)
     // (check if root is smaller than left child)
     // if ( a[swapi] < a[child] ) 
-    if ( compareXY(a[swapi], a[child]) < 0 ) 
+    if ( compare(a[swapi], a[child]) < 0 ) 
       swapi = child;
     // (check if right child exists, and if it's bigger 
     // than what we're currently swapping with)
     // if ( child+1 <= end && a[swapi] < a[child+1] )
-    if ( child+1 <= end && compareXY(a[swapi],a[child+1]) < 0 )
+    if ( child+1 <= end && compare(a[swapi],a[child+1]) < 0 )
       swapi = child + 1;
     // (check if we need to swap at all)
     if ( swapi != root ) {

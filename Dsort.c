@@ -1,4 +1,5 @@
-void dflgm(int N, int M, int pivotx, void (*cut)(), int depthLimit) {
+void dflgm(void **A, int N, int M, int pivotx, void (*cut)(), 
+	   int depthLimit, int (*compareXY)()) {
   // printf("dflgm N %i M %i pivotx %i depthLimit %i\n", N,M,pivotx,depthLimit);
   /*
     Simple version of partitioning with: L/M/R
@@ -22,10 +23,10 @@ void dflgm(int N, int M, int pivotx, void (*cut)(), int depthLimit) {
       lw < x < up  ==> A[x] = p3
       j < x <= M & ==> p3 < A[x] 
     */
-  p3 = A[pivotx]; // There IS a middle value somewhere:
-  // store p3 temporarily; A[N] will be replaced at the end
-  // x is the wack-a-mole item
-  x = A[N]; A[N] = p3; i++; 
+  x = A[N]; // roving variable, the wack-a-mole item
+  p3 = A[N] = A[pivotx]; // There IS a middle value somewhere:
+  // p3 is temporarily also in A[N]; will be replaced at the end
+  i++; 
   r = compareXY(x, p3);
   // if ( x < p3 ) goto L0;
   if ( r < 0 ) goto L0;
@@ -292,10 +293,10 @@ void dflgm(int N, int M, int pivotx, void (*cut)(), int depthLimit) {
 	}
       */
     if ( i - N  < M - j ) {
-      (*cut)(N, i, depthLimit);
-      (*cut)(j, M, depthLimit);
+      (*cut)(A, N, i, depthLimit, compareXY);
+      (*cut)(A, j, M, depthLimit, compareXY);
       return;
     }
-    (*cut)(j, M, depthLimit);
-    (*cut)(N, i, depthLimit);
+    (*cut)(A, j, M, depthLimit, compareXY);
+    (*cut)(A, N, i, depthLimit, compareXY);
 } // end dflgm

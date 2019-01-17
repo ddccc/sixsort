@@ -75,17 +75,21 @@ void callQuicksort0(void **AA, int size, int (*compar )());
 void callCut2(void **AA, int size, int (*compar )());
 void callQsort(void **A, int size, int (*compar )());
 void callHeapsort(void **A, int size, int (*compar )());
-void callBentley();
+void callBentley(void **A, int size, int (*compar )());
 void callLQ();
 void callChensort();
+void callPart3();
 void compareBentleyAgainstSixSort();
 void compareLQAgainstSixSort();
 void compareChenSortAgainstSixSort();
-void compareCut2AgainstSixsort();
+void compareCut2AgainstSixSort();
 void compareQsortAgainstQuicksort0();
 void compareQsortAgainstCut2();
-void compareQuicksort0AgainstSixsort();
-void compareSixsortAgainstXYZ();
+void compareQuicksort0AgainstSixSort();
+void comparePart3AgainstSixSort();
+void compareSixSortAgainstXYZ();
+void iswap();
+void insertionsort();
 void quicksort0(void **A, int N, int M, int (*compar )());
 void cut2(void **A, int N, int M, int (*compar )());
 void cut2f(void **A, int N, int M, int (*compar )());
@@ -93,6 +97,7 @@ void cut4(void **A, int N, int M, int (*compar )());
 void sixsort(void **A, int size, 
 	      int (*compar ) (const void *, const void * ));
 void heapSort(void **a, int count, int (*compar )());
+void part3();
 void testBentley();
 void testQsort();
 void testQuicksort0();
@@ -105,8 +110,8 @@ void validateBentley();
 void validateQsort();
 int clock();
 void validateSixSortBT();
-void compareBentleyAgainstSixsort(); // on Bentley test bench
-
+void compareBentleyAgainstSixSort(); // on Bentley test bench
+void comparePart3BAgainstSixSort(); // on Bentley test bench
 
 // Here global entities used throughout
 // int (*compareXY)();
@@ -166,15 +171,17 @@ int main (int argc, char *argv[]) {
      // compareSixsortAgainstXYZ();
      // ... and uncomment also compareSixsortAgainstXYZ ...
   // Whatever here:::
-     // compareQuicksort0AgainstSixsort();
-     // compareCut2AgainstSixsort();
+     // compareQuicksort0AgainstSixSort();
+     // compareCut2AgainstSixSort();
      // compareQsortAgainstQuicksort0(); 
      // compareQsortAgainstCut2(); 
-     compareBentleyAgainstSixSort();
+     // compareBentleyAgainstSixSort();
      // compareLQAgainstSixSort();
      // compareChenSortAgainstSixSort();
+     comparePart3AgainstSixSort();
      // validateSixSortBT();
-     // compareBentleyAgainstSixsort(); // on Bentley test bench
+     // compareBentleyAgainstSixSort(); // on Bentley test bench
+     // comparePart3BAgainstSixSort(); // on Bentley test bench
      return 0;
 } // end of main
 
@@ -582,12 +589,12 @@ void compareSixsortAgainstXYZ() {
   compareAlgorithms("Compare sixsort vs XYZ", sixsort, XYZ);
 }
 */
-void compareQuicksort0AgainstSixsort() {
+void compareQuicksort0AgainstSixSort() {
   void sixsort(), callQuicksort0();
   compareAlgorithms("Compare quicksort0 vs sixsort", callQuicksort0, sixsort);
 } // end compareQuicksort0AgainstSixsort
 
-void compareCut2AgainstSixsort() {
+void compareCut2AgainstSixSort() {
   void sixsort(), callCut2();
   compareAlgorithms("Compare cut2 vs sixsort", callCut2, sixsort);
 } // end compareCut2AgainstSixsort 
@@ -596,6 +603,11 @@ void callQuicksort0(void **A, int size,
 	int (*compar ) (const void *, const void * ) ) {
   quicksort0(A, 0, size-1, compar);
 } // end callQuicksort0
+
+void comparePart3AgainstSixSort() {
+  void sixsort(), callPart3();
+  compareAlgorithms("Compare part3 vs sixsort", callPart3, sixsort);
+} // end comparePart3AgainstSixsort 
 
 void compareQsortAgainstQuicksort0() {
    void callQsort(), callQuicksort0();
@@ -640,11 +652,9 @@ void compareChenSortAgainstSixSort(){
 
 void bentley();
 // Wrapper function to invoke bentley
-void callBentley(void **A, int size,
-      int (*compar ) (const void *, const void * ) ) {
+void callBentley(void **A, int size, int (*compar ) () ) {
   struct intval *pi;
-  bentley(A, size, sizeof(pi), 
-	(int(*)(const void *, const void *)) compar);
+  bentley(A, size, sizeof(pi), compar);
 } // end callBentley
 
 // #include <_ansi.h>
@@ -654,8 +664,8 @@ void callBentley(void **A, int size,
 #define inline
 #endif
 
-static inline char	*med33 _PARAMS((char *, char *, char *, int (*)()));
-static inline void	 swapfunc _PARAMS((char *, char *, int, int));
+// static inline char	*med33 _PARAMS((char *, char *, char *, int (*)()));
+// static inline void	 swapfunc _PARAMS((char *, char *, int, int));
 
 #define min(a, b)	(a) < (b) ? a : b
 
@@ -1158,7 +1168,7 @@ void swapfunc(char *a, char *b, int n, int swaptype)
   */
 
 
-#define p 16
+#define px 16
 #define beta1 256
 #define beta2 512
 // Symmetry Partition Sort
@@ -1190,7 +1200,7 @@ void SymPartitionSort(char *a, int s, int n, int es, int (*cmp)(const void *,con
                 left=right=1; pc-=es;
             }
             else{
-               v=m > n/beta1 ? n : p*m-1;
+               v=m > n/beta1 ? n : px*m-1;
                if(s < 0) {  //Move sorted items to left end
                       if(v<n) {left=m; s=-s;}
                       else    {left=(m+1)/2; right=m/2;} 
@@ -1299,6 +1309,126 @@ void Adp_SymPSort(void *a, int n, int es, int (*cmp)(const void *,const void *))
     if(left < n) SymPartitionSort((char *)a, left, n, es, cmp);
 } // end Adp_SymPSort
 
+void callPart3(void **A, int size, int (*compare)()) {
+  part3(A, 0, size-1, compare);
+}
+void partition3();
+void part3(void **A, int N, int M, int (*compare)()) {
+  partition3(A, N, M, compare);
+} // end part3
+
+void partition3(void **A, int left, int right,
+		int (*compar ) (const void *, const void * ) ) {
+  int L;
+Again:
+  // printf("partition3 left %i right %i\n", left, right);
+    L = right - left;
+    if ( L <= 12 ) { 
+      // insertionSortLoopUnroll(A, left, right);
+      insertionsort(A, left, right, compar);
+      return;
+    }
+    int e = L/6;
+    int mid = left + L/2;
+                               // B[0] = A[left]; 
+    iswap(left+1, left+e, A);  // B[1] = A[left+e]; 
+    iswap(left+2, mid-e, A);   // B[2] = A[mid-e];
+    iswap(left+3, mid, A);     // B[3] = A[mid];
+    iswap(left+4, mid+e, A);   // B[4] = A[mid+e]; 
+    iswap(left+5, right-e, A); // B[5] = A[right-e]; 
+    iswap(left+6, right, A);   // B[6] = A[right];
+    // insertionSortB(B, 0, 6);
+    insertionsort(A, left, left + 6, compar);
+    // A[left] = B[0]; A[left+e] = B[1]; A[mid-e] = B[2];
+    // A[mid] = B[3];
+    // A[mid+e] = B[4]; A[right-e] = B[5]; A[right] = B[6];
+    iswap(left, left+1, A); // iswap(left, left+e, A);   // -> p
+    iswap(left+1, left+3, A); // iswap(left+1, mid, A);    // -> q
+    iswap(right, left+5, A);// iswap(right, right-e, A); // -> r 
+
+    int a = left + 2; int b = a;
+    int c = right - 1; int d = c;
+    void *p = A[left]; void *q = A[left + 1]; void *r = A[right];
+    while ( b <= c ) {
+        // while ( A[b] < q && b <= c ) {
+        while ( compar(A[b], q) < 0 && b <= c ) {
+	   // if ( A[b] < p ) {
+	   if ( compar(A[b], p) < 0 ) {
+              // swap(A[a], A[b]); 
+	      iswap(a, b, A); 
+              a++;
+           }
+           b++;
+        }
+        // while ( A[c] > q && b <= c ) {
+	while ( compar(A[c], q) > 0 && b <= c ) {
+	   // if ( A[c] > r ) {
+	   if ( compar(A[c], r) > 0 ) {
+              // swap(A[c], A[d]);
+	      iswap(c, d, A); 
+              d--;
+           }
+           c--;
+        }
+        if ( b <= c ) {
+           // if ( A[b] > r ) {
+	   if ( compar(A[b], r) > 0 ) {
+             // if ( A[c] < p ) {
+	     if ( compar(A[c], p) < 0 ) {
+                // swap(A[b],A[a]); swap(A[a],A[c]);
+		iswap(a, b, A); iswap(a, c, A);   		    
+                a++;
+             } else
+                // swap(A[b],A[c]);
+		iswap(c, b, A);
+             // swap(A[c],A[d]); 
+	     iswap(c, d, A); 
+             b++; c--; d--;
+          } else {
+             // if ( A[c] < p ) {
+	     if ( compar(A[c], p) < 0 ) {
+                // swap(A[b],A[a]); swap(A[a],A[c]);
+		iswap(a, b, A); iswap(a, c, A);   
+                a++;
+             } else
+                // swap(A[b],A[c]);
+		iswap(b, c, A);  
+             b++; c--;
+          }
+        }
+    } 
+    a--; b--; c++; d++;
+    // swap(A[left + 1],A[a]); swap(A[a],A[b]);
+    iswap(left+1, a, A); iswap(a, b, A);
+    a--;
+    // swap(A[left],A[a]); swap(A[right],A[d]);
+    iswap(left, a, A); iswap(right, d, A);
+    // recursive calls & tail recursion
+    if ( b - left <= right - b ) {
+       partition3(A, left, a, compar);
+       partition3(A, a+1, b, compar);
+       if ( b - d <= right - d ) {
+       	  partition3(A, b+1, d-1, compar);
+	  left = d; 
+	  goto Again;
+       } else {
+	  partition3(A, d, right, compar);
+	  left = b+1; right = d-1;
+	  goto Again;
+       }
+    } else {
+       partition3(A, b+1, d-1, compar);
+       partition3(A, d, right, compar);
+       if ( a - left <= b - a ) {
+          partition3(A, left, a, compar);
+	  left = a+1; right = b;
+	  goto Again;
+       }	  
+       partition3(A, a+1, b, compar);
+       right = a;
+       goto Again;
+    }
+} // end partition3
 
 // Bentley test-bench content generators
 /*
@@ -1574,12 +1704,12 @@ void validateSixSortBT() {
 } // end validateSixSortBT
 
 void compareBentleyAgainstSixsort() {
-  printf("Entering compareBentleyAgainstCut3 Sawtooth ........\n");
-  // printf("Entering compareBentleyAgainstCut3 Rand2 ........\n");
-  // printf("Entering compareBentleyAgainstCut3 Plateau ........\n");
-  // printf("Entering compareBentleyAgainstCut3 Shuffle ........\n");
-  // printf("Entering compareBentleygAainstCut3 Stagger ........\n");
-  int bentleyTime, cut3Time, T;
+  printf("Entering compareBentleyAgainstCut4 Sawtooth ........\n");
+  // printf("Entering compareBentleyAgainstCut4 Rand2 ........\n");
+  // printf("Entering compareBentleyAgainstCut4 Plateau ........\n");
+  // printf("Entering compareBentleyAgainstCut4 Shuffle ........\n");
+  // printf("Entering compareBentleygAainstCut4 Stagger ........\n");
+  int bentleyTime, cut4Time, T;
   int seed = 666;
   int z;
   // int siz = 1024;
@@ -1606,17 +1736,17 @@ void compareBentleyAgainstSixsort() {
     // warm up the process
     fillarray(A, siz, seed);
     int TFill, m, tweak;
-    int bentleyCnt, cut3Cnt; // , bentleyCntx, cut3Cntx;
-    int sumQsortB, sumCut3; // , sumQsortBx, sumCut3x;
+    int bentleyCnt, cut4Cnt; // , bentleyCntx, cut4Cntx;
+    int sumQsortB, sumCut4; // , sumQsortBx, sumCut4x;
     // for (z = 0; z < 3; z++) { // repeat to check stability
     for (z = 0; z < 1; z++) { // repeat to check stability
-      bentleyCnt = cut3Cnt = sumQsortB = sumCut3 = 0;
-      // bentleyCntx = cut3Cntx = sumQsortBx = sumCut3x = 0;
+      bentleyCnt = cut4Cnt = sumQsortB = sumCut4 = 0;
+      // bentleyCntx = cut4Cntx = sumQsortBx = sumCut4x = 0;
       for (m = 1; m < 2 * siz; m = m * 2) {
       // m = 1024 * 1024; {
       	for (tweak = 0; tweak <= 5; tweak++ ) {
 	  if (4 == tweak) continue; // due to bias 
-	  bentleyTime = 0; cut3Time = 0;
+	  bentleyTime = 0; cut4Time = 0;
 	  TFill = clock();
 	  for (seed = 0; seed < seedLimit; seed++) 
 	    // sawtooth(A, siz, m, tweak);
@@ -1634,8 +1764,8 @@ void compareBentleyAgainstSixsort() {
 	    // shuffle(A, siz, m, tweak, seed);  // not used
 	    // stagger(A, siz, m, tweak);
 	    slopes(A, siz, m, tweak);
-	    // callBentley(A, 0, siz-1); 
-	    callCut2(A, siz, compareIntVal); 
+	    callBentley(A, siz, compareIntVal2);
+	    // callCut2(A, siz, compareIntVal); 
 	    // callQuicksort0(B, siz, compareIntVal); 
 	  }
 	  bentleyTime = bentleyTime + clock() - T - TFill;
@@ -1651,30 +1781,30 @@ void compareBentleyAgainstSixsort() {
 	    slopes(A, siz, m, tweak);
 	    sixsort(A, siz, compareIntVal);
 	  }
-	  cut3Time = cut3Time + clock() - T - TFill;
-	  sumCut3 += cut3Time;
-	  // if ( 4 != tweak ) sumCut3x += cut3Time;
+	  cut4Time = cut4Time + clock() - T - TFill;
+	  sumCut4 += cut4Time;
+	  // if ( 4 != tweak ) sumCut4x += cut4Time;
 	  printf("size: %d m: %d tweak: %d ", siz, m, tweak);
 	  printf("bentleyTime: %d ", bentleyTime);
-	  printf("Cut3Time: %d ", cut3Time);
+	  printf("Cut4Time: %d ", cut4Time);
 	  frac = 0;
-	  if ( bentleyTime != 0 ) frac = cut3Time / ( 1.0 * bentleyTime );
+	  if ( bentleyTime != 0 ) frac = cut4Time / ( 1.0 * bentleyTime );
 	  printf("frac: %f \n", frac);
-	  if ( bentleyTime < cut3Time ) bentleyCnt++;
-	  else cut3Cnt++;
+	  if ( bentleyTime < cut4Time ) bentleyCnt++;
+	  else cut4Cnt++;
 	}
-	printf("sumQsortB:   %i sumCut3:  %i frac: %f", 
-	       sumQsortB, sumCut3, (sumCut3/(1.0 * sumQsortB)));
-	printf(" bentleyCnt:  %i cut3Cnt:  %i\n", bentleyCnt, cut3Cnt);
+	printf("sumQsortB:   %i sumCut4:  %i frac: %f", 
+	       sumQsortB, sumCut4, (sumCut4/(1.0 * sumQsortB)));
+	printf(" bentleyCnt:  %i cut4Cnt:  %i\n", bentleyCnt, cut4Cnt);
       }
       frac = 0;
-      if ( sumQsortB != 0 ) frac = sumCut3 / ( 1.0 * sumQsortB );
+      if ( sumQsortB != 0 ) frac = sumCut4 / ( 1.0 * sumQsortB );
       printf("Measurements:\n");
-      printf("sumQsortB:   %i sumCut3:  %i frac: %f", 
-	     sumQsortB, sumCut3, (sumCut3/(1.0 * sumQsortB)));
-      printf(" bentleyCnt:  %i cut3Cnt:  %i\n", bentleyCnt, cut3Cnt);
-      // printf("sumQsortBx:  %i sumCut3x: %i", sumQsortBx, sumCut3x);
-      // printf(" bentleyCntx: %i cut3Cntx: %i\n", bentleyCntx, cut3Cntx);
+      printf("sumQsortB:   %i sumCut4:  %i frac: %f", 
+	     sumQsortB, sumCut4, (sumCut4/(1.0 * sumQsortB)));
+      printf(" bentleyCnt:  %i cut4Cnt:  %i\n", bentleyCnt, cut4Cnt);
+      // printf("sumQsortBx:  %i sumCut4x: %i", sumQsortBx, sumCut4x);
+      // printf(" bentleyCntx: %i cut4Cntx: %i\n", bentleyCntx, cut4Cntx);
     }
     free(A);
     // siz = siz * 2;
@@ -1683,4 +1813,117 @@ void compareBentleyAgainstSixsort() {
     seedLimit = seedLimit / 4;
   }
 
-} // end compareBentleyAgainstSixsort
+} // end compareBentleyAgainstSixSort
+
+
+void comparePart3BAgainstSixSort() {
+  // printf("Entering comparePart3AgainstCut4 Sawtooth ........\n");
+  printf("Entering comparePart3AgainstCut4 Rand2 ........\n");
+  // printf("Entering comparePart3AgainstCut4 Plateau ........\n");
+  // printf("Entering comparePart3AgainstCut4 Shuffle ........\n");
+  // printf("Entering comparePart3gAainstCut4 Stagger ........\n");
+  int part3Time, cut4Time, T;
+  int seed = 666;
+  int z;
+  // int siz = 1024;
+  int siz = 1024*1024;
+  // int limit = 1024 * 1024 * 16 + 1;
+  // int seedLimit = 32 * 1024;
+  int limit = siz + 1;
+  // int seedLimit = 32;
+  int seedLimit = 1;
+  float frac;
+  while (siz <= limit) {
+    printf("%s %d %s %d %s", "siz: ", siz, " seedLimit: ", seedLimit, "\n");
+    // int A[siz];
+    // void **A = malloc (sizeof(int) * siz);
+    // create array
+    struct intval *pi;
+    void **A = myMalloc("comparePart3AgainstFivesort 1", sizeof(pi) * siz);
+    int i;
+    for (i = 0; i < siz; i++) {
+      pi = myMalloc("comparePart3AgainstFivesort 2", sizeof (struct intval));
+      A[i] = pi;
+    };
+
+    // warm up the process
+    fillarray(A, siz, seed);
+    int TFill, m, tweak;
+    int part3Cnt, cut4Cnt; // , part3Cntx, cut4Cntx;
+    int sumQsortB, sumCut4; // , sumQsortBx, sumCut4x;
+    // for (z = 0; z < 3; z++) { // repeat to check stability
+    for (z = 0; z < 1; z++) { // repeat to check stability
+      part3Cnt = cut4Cnt = sumQsortB = sumCut4 = 0;
+      // part3Cntx = cut4Cntx = sumQsortBx = sumCut4x = 0;
+      for (m = 1; m < 2 * siz; m = m * 2) {
+      // m = 1024 * 1024; {
+      	for (tweak = 0; tweak <= 5; tweak++ ) {
+	  if (4 == tweak) continue; // due to bias of sorted arrays
+	  part3Time = 0; cut4Time = 0;
+	  TFill = clock();
+	  for (seed = 0; seed < seedLimit; seed++) 
+	    // sawtooth(A, siz, m, tweak);
+	    rand2(A, siz, m, tweak, seed);
+	    // plateau(A, siz, m, tweak); // not used
+	    // shuffle(A, siz, m, tweak, seed); // not used
+	    // stagger(A, siz, m, tweak);
+	    // slopes(A, siz, m, tweak);
+	  TFill = clock() - TFill;
+	  T = clock();
+	  for (seed = 0; seed < seedLimit; seed++) { 
+	    // sawtooth(A, siz, m, tweak);
+	    rand2(A, siz, m, tweak, seed);
+	    // plateau(A, siz, m, tweak); // not used
+	    // shuffle(A, siz, m, tweak, seed);  // not used
+	    // stagger(A, siz, m, tweak);
+	    // slopes(A, siz, m, tweak);
+	    callPart3(A, siz, compareIntVal); 
+	    // callCut2(A, siz, compareIntVal); 
+	    // callQuicksort0(B, siz, compareIntVal); 
+	  }
+	  part3Time = part3Time + clock() - T - TFill;
+	  sumQsortB += part3Time;
+	  // if ( 4 != tweak ) sumQsortBx += part3Time;
+	  T = clock();
+	  for (seed = 0; seed < seedLimit; seed++) { 
+	    // sawtooth(A, siz, m, tweak);
+	    rand2(A, siz, m, tweak, seed);
+	    // plateau(A, siz, m, tweak); // not used
+	    // shuffle(A, siz, m, tweak, seed); // not used
+	    // stagger(A, siz, m, tweak);
+	    // slopes(A, siz, m, tweak);
+	    sixsort(A, siz, compareIntVal);
+	  }
+	  cut4Time = cut4Time + clock() - T - TFill;
+	  sumCut4 += cut4Time;
+	  // if ( 4 != tweak ) sumCut4x += cut4Time;
+	  printf("size: %d m: %d tweak: %d ", siz, m, tweak);
+	  printf("part3Time: %d ", part3Time);
+	  printf("Cut4Time: %d ", cut4Time);
+	  frac = 0;
+	  if ( part3Time != 0 ) frac = cut4Time / ( 1.0 * part3Time );
+	  printf("frac: %f \n", frac);
+	  if ( part3Time < cut4Time ) part3Cnt++;
+	  else cut4Cnt++;
+	}
+	printf("sumQsortB:   %i sumCut4:  %i frac: %f", 
+	       sumQsortB, sumCut4, (sumCut4/(1.0 * sumQsortB)));
+	printf(" part3Cnt:  %i cut4Cnt:  %i\n", part3Cnt, cut4Cnt);
+      }
+      frac = 0;
+      if ( sumQsortB != 0 ) frac = sumCut4 / ( 1.0 * sumQsortB );
+      printf("Measurements:\n");
+      printf("sumQsortB:   %i sumCut4:  %i frac: %f", 
+	     sumQsortB, sumCut4, (sumCut4/(1.0 * sumQsortB)));
+      printf(" part3Cnt:  %i cut4Cnt:  %i\n", part3Cnt, cut4Cnt);
+      // printf("sumQsortBx:  %i sumCut4x: %i", sumQsortBx, sumCut4x);
+      // printf(" part3Cntx: %i cut4Cntx: %i\n", part3Cntx, cut4Cntx);
+    }
+    free(A);
+    // siz = siz * 2;
+    // seedLimit = seedLimit / 2;
+    siz = siz * 4;
+    seedLimit = seedLimit / 4;
+  }
+
+} // end comparePart3AgainstSixSort
