@@ -501,7 +501,8 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
   int z;
   int limit = 1024 * 1024 * 16 + 1;
   while (siz <= limit) {
-    printf("%s %d %s %d %s", "siz: ", siz, " seedLimit: ", seedLimit, "\n");
+    if ( seedLimit < 30 ) seedLimit = 30;
+    printf("siz: %d seedLimit: %d\n", siz, seedLimit);
     struct intval *pi;
     void **A = myMalloc("compareAlgorithms0 1", sizeof(pi) * siz);
     // construct array
@@ -510,48 +511,55 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
       pi = myMalloc("compareAlgorithms0 2", sizeof (struct intval));
       A[i] = pi;
     };
+
     // warm up the process
     for (seed = 0; seed < seedLimit; seed++) 
       fillarray(A, siz, seed);
     // for (z = 0; z < 6; z++) { // repeat to check stability
-    int repeats = 10; // even 
-    float fracs[repeats-1];
+    int repeats = 1; 
+    int totalAlg1 = 0; int totalAlg2 = 0;
+    int TFill;
     for (z = 0; z < repeats; z++) { // repeat to check stability
-      alg1Time = 0; alg2Time = 0;
-      int TFill = clock();
-      for (seed = 0; seed < seedLimit; seed++) 
+      alg1Time = 0; 
+      TFill = clock();
+      // for (seed = 0; seed < seedLimit; seed++) 
+      for (seed = siz; seed < siz+seedLimit; seed++) 
 	fillarray(A, siz, seed);
       TFill = clock() - TFill;
       T = clock();
-      for (seed = 0; seed < seedLimit; seed++) { 
+      // for (seed = 0; seed < seedLimit; seed++) { 
+      for (seed = siz; seed < siz+seedLimit; seed++) {
 	fillarray(A, siz, seed);
 	(*alg1)(A, siz, compare1); 
       }
       alg1Time = clock() - T - TFill;
+      totalAlg1 += alg1Time;
+    }
+    for (z = 0; z < repeats; z++) { // repeat to check stability
+      alg2Time = 0;
+      int TFill = clock();
+      // for (seed = 0; seed < seedLimit; seed++)
+      for (seed = siz; seed < siz+seedLimit; seed++)  
+	fillarray(A, siz, seed);
+      TFill = clock() - TFill;
       T = clock();
-      for (seed = 0; seed < seedLimit; seed++) { 
+      // for (seed = 0; seed < seedLimit; seed++) { 
+      for (seed = siz; seed < siz+seedLimit; seed++) {
 	fillarray(A, siz, seed);
 	(*alg2)(A, siz, compare2);
       }
       alg2Time = clock() - T - TFill;
-      /*
-      printf("%s %d %s", "siz: ", siz, " ");
-      printf("%s %d %s", "alg1Time: ", alg1Time, " ");
-      printf("%s %d %s", "alg2Time: ", alg2Time, " ");
-      */
-      float frac = 0;
-      if ( alg1Time != 0 ) frac = alg2Time / ( 1.0 * alg1Time );
-      // printf("%s %f %s", "frac: ", frac, "\n");
-      if (0==z) continue;
-      int y = z-1;
-      fracs[y] = frac;
-      while (0 < y) {
-	if ( fracs[y-1] <= fracs[y] ) break;
-	frac = fracs[y-1]; fracs[y-1] = fracs[y]; fracs[y] = frac;
-	y--;
-      }
+      totalAlg2 += alg2Time;
     }
-    printf("siz:  %i median of fracs: %f\n", siz, fracs[repeats/2]);
+    totalAlg1 = totalAlg1/repeats;
+    totalAlg2 = totalAlg2/repeats;
+    printf("siz: %d ", siz);
+    printf("totalAlg1: %d ", totalAlg1);
+    printf("totalAlg2: %d ", totalAlg2);
+    float frac = 0;
+    if ( totalAlg1 != 0 ) frac = totalAlg2 / ( 1.0 *  totalAlg1 );
+    printf("frac: %f\n", frac);
+
     // free array
     for (i = 0; i < siz; i++) {
       free(A[i]);
@@ -577,8 +585,8 @@ void compareAlgorithms2(char *label, int siz, int seedLimit,
  } // end compareAlgorithms2
 
 void compareAlgorithms(char *label, void (*alg1)(), void (*alg2)() ) {
-  compareAlgorithms0(label, 1024, 32 * 1024, alg1, alg2);
-  // compareAlgorithms0(label, 16 * 1024 * 1024, 4, alg1, alg2);
+  // compareAlgorithms0(label, 1024, 32 * 1024, alg1, alg2);
+  compareAlgorithms0(label, 16 * 1024 * 1024, 4, alg1, alg2);
   // compareAlgorithms0(label, 1024 * 1024, 32, alg1, alg2);
 } // end compareAlgorithms
 
