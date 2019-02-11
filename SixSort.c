@@ -1,5 +1,5 @@
+/* 
 
-/*
 Copyright (c) 2012, Dennis de Champeaux.  All rights reserved.
 
 The copyright holders hereby grant to any person obtaining a copy of
@@ -58,10 +58,6 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include <string.h>
 #include <math.h>
 
-// const int cut2Limit = 127;
-// const int cut3Limit = 250; 
-// const int cut4Limit = 375; 
-// const int probeParamCut4 = 1000000;
 
 char* expiration = "*** License for sixsort has expired ...\n";
 
@@ -69,16 +65,13 @@ char* expiration = "*** License for sixsort has expired ...\n";
 // int (*compareXY)();
 // void **A;
 
-/*
-#include "Isort.c"
-#include "Hsort.c"
+
 #include "Qusort.c"
-#include "Dsort.c"
-*/
+#include "C2sort.c" 
+#include "C2fsort.c"
 
-#include "C2fsort.c" 
-#include "C4.c" 
-
+#include "c4.c"
+ 
 
 void sixsort(void **AA, int size, 
 	int (*compar ) (const void *, const void * ) ) {

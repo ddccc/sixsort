@@ -102,7 +102,7 @@ int compareIntVal (const void *a, const void *b)
 void callHeapsort(void **A, int size, int (*compar)() );
 void heapc(void **A, int N, int M, int (*compar)());
 void heapSort(void **A, int size, int (*compar)());
-void cut2f(void **A, int N, int M, int (*compar)());
+// void cut2f(void **A, int N, int M, int (*compar)());
 void dflgm(void **A, int N, int M, int pivotx, void (*cut)(), int depthLimit, int (*compar)());
 void sixsort(void **AA, int size, 
 	int (*compar ) (const void *, const void * ),
@@ -112,8 +112,8 @@ void testSixsort();
 void testSixSort2();
 void testThreesort();
 void timeTest();
-void compareThreesortAgainstCut2();
-void compareSixsortAgainstCut2();
+void compareThreesortAgainstQuicksort0();
+void compareSixsortAgainstQuicksort0();
 
 void validateParSixSortBT();
 void validateXYZ();
@@ -143,8 +143,8 @@ int main (int argc, char *argv[]) {
      // compareSixsortAgainstXYZ();
      // ... and uncomment also compareSixsortAgainstXYZ ...
   // Whatever here:::
-     // compareThreesortAgainstCut2();
-     compareSixsortAgainstCut2();
+     // compareThreesortAgainstQuicksort0();
+     // compareSixsortAgainstQuicksort0(); NONO
      // validateParSixSortBT();
      return 0;
 } // end of main
@@ -321,9 +321,9 @@ void testAlgorithmS(char* label, void (*alg1)() ) {
 } // end testAlgorithm0
 
 // Example: use of testAlgorithm
-void testCut2S() {
-  void callCut2();
-  testAlgorithmS("Running cut2S ...", callCut2);
+void testQuicksort0S() {
+  void callQuicksort0();
+  testAlgorithmS("Running quicksort0S ...", callQuicksort0);
 }
 
 // validateAlgorithm0 is used to check algorithm alg1 against a
@@ -383,15 +383,15 @@ void validateXYZ() {
 }
 */
 void validateXYZ() {
-  void sixsort(), callCut2();
-  validateAlgorithm("Running validate using callCut2 ...",
-		    sixsort, callCut2);
+  void sixsort(), callQuicksort0();
+  validateAlgorithm("Running validate using callQuicksort0 ...",
+		    sixsort, callQuicksort0);
 }
 /*
 void validateXYZ() {
-  void threesort(), callCut2();
-  validateAlgorithm("Running validate using callCut2 ...",
-		    threesort, callCut2);
+  void threesort(), callQuicksort0();
+  validateAlgorithm("Running validate using callQuicksort0 ...",
+		    threesort, callQuicksort0);
 }
 */
 
@@ -543,26 +543,25 @@ void compareSixsortAgainstXYZ() {
 }
 */
 
-void compareThreesortAgainstCut2() {
-  void threesort(), callCut2();
-  compareAlgorithms("Compare threesort vs cut2", threesort, callCut2);
-} // end compareThreesortAgainstCut2
+void compareThreesortAgainstQuicksort0() {
+  void threesort(), callQuicksort0();
+  compareAlgorithms("Compare threesort vs quicksort0", threesort, callQuicksort0);
+} // end compareThreesortAgainstQuicksort0
 
-void compareSixsortAgainstCut2() {
-  void  sixsort(), callCut2();
-  compareAlgorithms("Compare sixsort vs cut2", sixsort, callCut2);
-} // end compareSixsortAgainstCut2
+void compareSixsortAgainstQuicksort0() {
+  void  sixsort(), callQuicksort0();
+  compareAlgorithms("Compare sixsort vs quicksort0", sixsort, callQuicksort0);
+} // end compareSixsortAgainstQuicksort0
 
 
 // Here are global entities used throughout
 
 // void **A;
 // int (*compareXY)();
-void cut2();
-void callCut2(void **A, int size, int (*compar ) () ) {
-
-  cut2f(A, 0, size-1, compar);
-} // end callCut2
+void quicksort0();
+void callQuicksort0(void **A, int size, int (*compar ) () ) {
+  quicksort0(A, 0, size-1, compar);
+} // end callQuicksort0
 
 int sleepingThreads0;
 struct stack *llx;
@@ -593,13 +592,13 @@ void addTaskSynchronized0(struct stack *ll, struct task *t)
  } // end addTaskSynchronized0
 
 /* threesort is a 4-level sorter:
-   parallel cut2
-   sequential cut2
+   parallel quicksort0
+   sequential quicksort0
    sequential quicksort0
    sequential insertionsort
  */
 
-void cut2pc();
+void quicksort0pc();
 void *sortThread3(void *AAA) { // AAA-argument is NOT used
   // int taskCnt = 0;
   //  printf("Thread number: %ld #sleepers %d\n", 
@@ -627,22 +626,24 @@ void *sortThread3(void *AAA) { // AAA-argument is NOT used
     int (*compar)() = getXY(t);
     free(t);
     // taskCnt++;
-    cut2pc(A, n, m, depthLimit, compar);
+    quicksort0pc(A, n, m, depthLimit, compar);
   }
   // printf("Exit of Thread number: %ld taskCnt: %d\n", pthread_self(), taskCnt);
     return NULL;
  }  // end sortThread3
 
-void iswap();
+// void iswap();
+#define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
+
 void *partitionThreadLeft();
 void *partitionThreadRight();
-extern int cut2SLimit; // 2000
+const int quicksort0SLimit; // 2000
 void threesort(void **A, int size, 
 	  int (*compareXY ) (const void *, const void * ),
 	  int num) {
   // printf("threesort size %i\n", size);
-  if ( size <= cut2SLimit || num <= 1) {
-    callCut2(A, size, compareXY);
+  if ( size <= quicksort0SLimit || num <= 1) {
+    callQuicksort0(A, size, compareXY);
     return;
   }
   sleepingThreads0 = 0;
@@ -734,12 +735,14 @@ void threesort(void **A, int size,
       // swap the two middle segments
       if ( b <= c ) {
 	// printf("b <= c\n");
-	for ( k = 0; k < b; k++ ) iswap(e3-k, i2-k, A);
+	for ( k = 0; k < b; k++ ) // iswap(e3-k, i2-k, A);
+	  { int xx = e3-k, yy = i2-k; iswap(xx, yy, A); } 
 	m3 = i2 - b;
       }
       else {
 	// printf("c < b\n");
-	for ( k = 0; k < c+1; k++ ) iswap(middle2+k, i1+1+k, A);
+	for ( k = 0; k < c+1; k++ ) // iswap(middle2+k, i1+1+k, A);
+	  { int xx = middle2+k, yy = i1+1+k; iswap(xx, yy, A); } 
 	m3 = i1 + c+1;
       }
     }
@@ -772,34 +775,34 @@ void threesort(void **A, int size,
 } // end threesort
 
 
-// int cut2SLimit = 2000;
-int cut2SLimit2 = 1000;
+// int quicksort0SLimit = 2000;
+int quicksort0SLimit2 = 1000;
 
-void cut2pc();
-void cut2p(void **A, uint N, int M, int (*compar)() ) {
+void quicksort0pc();
+void quicksort0p(void **A, uint N, int M, int (*compar)() ) {
   int L = M - N;
-  if ( L < cut2SLimit ) { 
-    cut2(A, N, M, compar);
+  if ( L < quicksort0SLimit ) { 
+    quicksort0(A, N, M, compar);
     return;
   }
   int depthLimit = 2.5 * floor(log(L));
-  cut2pc(A, N, M, depthLimit, compar);
-} // end cut2p
+  quicksort0pc(A, N, M, depthLimit, compar);
+} // end quicksort0p
 
 void heapc();
-void cut2c(void **A, int N, int M, int depthLimit, int (*compar)());
-// cut2pc is pretty close to parallel FourSort
-void cut2pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
+void quicksort0c(void **A, int N, int M, int depthLimit, int (*compar)());
+// quicksort0pc is pretty close to parallel FourSort
+void quicksort0pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
         int L;
  Loop:
-	// printf("cut2pc N %i M %i\n", N, M);
+	// printf("quicksort0pc N %i M %i\n", N, M);
 	if ( depthLimit <= 0 ) {
 	  heapc(A, N, M, compareXY);
 	  return;
 	}
 	L = M - N;
-	if ( L <= cut2SLimit ) { 
-	  cut2c(A, N, M, depthLimit, compareXY);
+	if ( L <= quicksort0SLimit ) { 
+	  quicksort0c(A, N, M, depthLimit, compareXY);
 	  return;
 	}
 	depthLimit--;
@@ -839,8 +842,8 @@ void cut2pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
 	if ( compareXY(T, A[N]) <= 0 || compareXY(A[M], T) < 0 ) {
 	   // give up because cannot find a good pivot
 	   // dflgm is a dutch flag type of algorithm
-	   // void cut2c();
-	   dflgm(A, N, M, e3, cut2pc, depthLimit, compareXY);
+	   // void quicksort0c();
+	   dflgm(A, N, M, e3, quicksort0pc, depthLimit, compareXY);
 	   return;
 	 }
 
@@ -859,31 +862,33 @@ void cut2pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
 	// AI = A[I];
 	// if (AI < T) goto Left;
 	// if ( compareXY(AI,  T) < 0 ) goto Left;
-	while ( compareXY(A[++I],  T) < 0 ); AI = A[I];
+	while ( compareXY(A[++I],  T) < 0 ); 
+	AI = A[I];
 // Right:
 	// J = J - 1;
 	// AJ = A[J];
 	// if ( T <= AJ ) goto Right;
 	// if ( compareXY(T, AJ) <= 0 ) goto Right;
-	while ( compareXY(T, A[--J]) <= 0 ); AJ = A[J];
+	while ( compareXY(T, A[--J]) <= 0 ); 
+	AJ = A[J];
 	if ( I < J ) {
 	  A[I] = AJ; A[J] = AI;
 	  goto Left;
 	}
 	// Tail iteration
   	if ( (I - N) < (M - J) ) { // smallest one first
-	  // cut2Pc(N, J, depthLimit);
+	  // quicksort0Pc(N, J, depthLimit);
 	  // N = I; 
 	  addTaskSynchronized0(llx, newTask(A, I, M, depthLimit, compareXY));
 	  M = J;
 	  goto Loop;
 	}
-	// cut2Pc(I, M, depthLimit);
+	// quicksort0Pc(I, M, depthLimit);
 	// M = J;
 	addTaskSynchronized0(llx, newTask(A, N, J, depthLimit, compareXY));
 	N = I;
 	goto Loop;
-} // (*  OF cut2p; *) ... the brackets remind that this was Pascal code
+} // (*  OF quicksort0p; *) ... the brackets remind that this was Pascal code
 
 
 // Bentley file content generators
@@ -931,9 +936,9 @@ void tweakSort(void **AA, int n) {
   /*
   A = AA;
   compareXY = compareIntVal;
-  cut2(0, n-1);
+  quicksort0(0, n-1);
   */
-  callCut2(AA, n, compareIntVal);
+  callQuicksort0(AA, n, compareIntVal);
 } // end tweakSort
 void dither(void **A, int n) {
   int k;
@@ -1029,7 +1034,7 @@ void validateParSixSortBT() {
   // printf("Entering validateParSixSortBT Plateau ........\n");
   // printf("Entering validateParSixSortBT Shuffle ........\n");
   // printf("Entering validateParSixSortBT Stagger ........\n");
-  int sortcBTime, cut2Time, T;
+  int sortcBTime, quicksort0Time, T;
   int seed =  666;
   int z;
   int siz = 1024*1024;
@@ -1056,18 +1061,18 @@ void validateParSixSortBT() {
     // warm up the process
     fillarray(A, siz, seed);
     int TFill, m, tweak;
-    int sortcBCnt, cut2Cnt; // , sortcBCntx, cut2Cntx;
-    int sumQsortB, sumCut2; // , sumQsortBx, sumCut2x;
+    int sortcBCnt, quicksort0Cnt; // , sortcBCntx, quicksort0Cntx;
+    int sumQsortB, sumQuicksort0; // , sumQsortBx, sumQuicksort0x;
     // for (z = 0; z < 3; z++) { // repeat to check stability
     for (z = 0; z < 1; z++) { // repeat to check stability
-      sortcBCnt = cut2Cnt = sumQsortB = sumCut2 = 0;
-      // sortcBCntx = cut2Cntx = sumQsortBx = sumCut2x = 0;
+      sortcBCnt = quicksort0Cnt = sumQsortB = sumQuicksort0 = 0;
+      // sortcBCntx = quicksort0Cntx = sumQsortBx = sumQuicksort0x = 0;
       for (m = 1; m < 2 * siz; m = m * 2) {
       // m = 1024 * 1024; {
       // m = 1; {
       	for (tweak = 0; tweak <= 5; tweak++ ) {
 	// tweak = 5; {
-	  sortcBTime = 0; cut2Time = 0;
+	  sortcBTime = 0; quicksort0Time = 0;
 	  TFill = clock();
 	  for (seed = 0; seed < seedLimit; seed++) 
 	    sawtooth(A, siz, m, tweak);
@@ -1097,17 +1102,17 @@ void validateParSixSortBT() {
 	    // stagger(B, siz, m, tweak);
 	    sixsort(B, siz, compareIntVal, NUMTHREADS);  
 	  }
-	  cut2Time = cut2Time + clock() - T - TFill;
-	  sumCut2 += cut2Time;
-	  // if ( 4 != tweak ) sumCut2x += cut2Time;
+	  quicksort0Time = quicksort0Time + clock() - T - TFill;
+	  sumQuicksort0 += quicksort0Time;
+	  // if ( 4 != tweak ) sumQuicksort0x += quicksort0Time;
 	  printf("Size: %d m: %d tweak: %d ", siz, m, tweak);
 	  printf("sortcBTime: %d ", sortcBTime);
-	  printf("Cut2Time: %d ", cut2Time);
+	  printf("Quicksort0Time: %d ", quicksort0Time);
 	  frac = 0;
-	  if ( sortcBTime != 0 ) frac = cut2Time / ( 1.0 * sortcBTime );
+	  if ( sortcBTime != 0 ) frac = quicksort0Time / ( 1.0 * sortcBTime );
 	  printf("frac: %f \n", frac);
-	  if ( sortcBTime < cut2Time ) sortcBCnt++;
-	  else cut2Cnt++;
+	  if ( sortcBTime < quicksort0Time ) sortcBCnt++;
+	  else quicksort0Cnt++;
 	  for (i = 0; i < siz; i++) {
 	    if ( compareIntVal(A[i], B[i]) != 0 ) {
 	      printf("***** validateParSixSortBT m: %i tweak: %i at i: %i\n", 
@@ -1116,18 +1121,18 @@ void validateParSixSortBT() {
 	    }
 	  }
 	}
-	printf("sumQsortB:   %i sumCut2:  %i frac: %f", 
-	       sumQsortB, sumCut2, (sumCut2/(1.0 * sumQsortB)));
-	printf(" sortcBCnt:  %i cut2Cnt:  %i\n", sortcBCnt, cut2Cnt);
+	printf("sumQsortB:   %i sumQuicksort0:  %i frac: %f", 
+	       sumQsortB, sumQuicksort0, (sumQuicksort0/(1.0 * sumQsortB)));
+	printf(" sortcBCnt:  %i quicksort0Cnt:  %i\n", sortcBCnt, quicksort0Cnt);
       }
       frac = 0;
-      if ( sumQsortB != 0 ) frac = sumCut2 / ( 1.0 * sumQsortB );
+      if ( sumQsortB != 0 ) frac = sumQuicksort0 / ( 1.0 * sumQsortB );
       printf("Measurements:\n");
-      printf("sumQsortB:   %i sumCut2:  %i frac: %f", 
-	     sumQsortB, sumCut2, (sumCut2/(1.0 * sumQsortB)));
-      printf(" sortcBCnt:  %i cut2Cnt:  %i\n", sortcBCnt, cut2Cnt);
-      // printf("sumQsortBx:  %i sumCut2x: %i", sumQsortBx, sumCut2x);
-      // printf(" sortcBCntx: %i cut2Cntx: %i\n", sortcBCntx, cut2Cntx);
+      printf("sumQsortB:   %i sumQuicksort0:  %i frac: %f", 
+	     sumQsortB, sumQuicksort0, (sumQuicksort0/(1.0 * sumQsortB)));
+      printf(" sortcBCnt:  %i quicksort0Cnt:  %i\n", sortcBCnt, quicksort0Cnt);
+      // printf("sumQsortBx:  %i sumQuicksort0x: %i", sumQsortBx, sumQuicksort0x);
+      // printf(" sortcBCntx: %i quicksort0Cntx: %i\n", sortcBCntx, quicksort0Cntx);
 
     }
     // free array

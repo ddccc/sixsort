@@ -4,8 +4,6 @@
 
 const int cut2fLimit = 2000;
 
-#include "C2sort.c" 
-
 void cut2fc();
 // cut2f is used as a best in class quicksort implementation 
 // with a defense against quadratic behavior due to duplicates
@@ -94,8 +92,8 @@ void cut2fc(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
      goto Skip;
 
 
-     // The left segment has elements <= T
-     // The right segment has elements > T
+     // The left segment has elements < T
+     // The right segment has elements >= T
      // Proceed with fast loops
   Left:
 	while ( compareXY(A[++I], T) <= 0 ); 

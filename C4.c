@@ -4,10 +4,7 @@
 
 // Source of cut4
 
-int cut4Limit = 3000;
-// int cut4Limit = 200;
-int probeParamCut4 = 1000000;
-
+const int cut4Limit = 3000;
 
 // Here more global entities used throughout
 // int (*compareXY)();
@@ -19,7 +16,8 @@ void cut4(void **A, int N, int M, int (*compareXY)()) {
   // printf("cut4 %d %d \n", N, M);
   int L = M - N; 
   if ( L < cut4Limit ) {
-    cut2f(A, N, M, compareXY); 
+    // cut2f(A, N, M, compareXY); 
+    quicksort0(A, N, M, compareXY); 
     return; 
   }
   // cut4c(N, M, 0); return; // for testing heapsort
@@ -38,7 +36,8 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
   // printf("cut4c %d %d  %d\n", N, M, depthLimit);
   int L = M - N; 
   if ( L < cut4Limit ) {
-    cut2fc(A, N, M, depthLimit, compareXY); 
+    // cut2fc(A, N, M, depthLimit, compareXY); 
+    quicksort0c(A, N, M, depthLimit, compareXY); 
     return; 
   }
   depthLimit--;
@@ -46,9 +45,10 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
   // pivots for left/ middle / right regions
   register void *maxl, *middle, *minr;   
 
-  
-  int probeLng = L/ probeParamCut4;
-  if ( probeLng < 20 ) probeLng = 20; // quite short indeed
+  // int probeLng = ( L < 130000 ? 20 : sqrt(L*1.0)/ 15.0 );
+  // int probeLng = ( L < 130000 ? 24 : sqrt(L*1.0)/ 14.0 );
+  // int probeLng = ( L < 130000 ? 28 : sqrt(L*1.0)/ 14.0 );
+  int probeLng = ( L < 130000 ? 32 : sqrt(L*1.0)/ 14.0 );
   int halfSegmentLng = probeLng >> 1; // probeLng/2;
   int N1 = N + (L>>1) - halfSegmentLng;
   int M1 = N1 + probeLng - 1;
@@ -61,9 +61,9 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
 
   // assemble the mini array [N1, M1]
   int k;
-  for (k = 0; k < probeLng; k++) iswap(N1 + k, N + k * offset, A);
+  for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
+    { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
   // sort this mini array to obtain good pivots
-  // cut2(A, N1, M1, compareXY); 
   quicksort0(A, N1, M1, compareXY); 
 
   if ( compareXY(A[maxlx], A[middlex]) == 0 || 
@@ -73,17 +73,27 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
     dflgm(A, N, M, middlex, cut4c, depthLimit, compareXY);
     return;
   }
-  
-  void *x, *y; // values  
-  int hole;
-
-  iswap(N+1, maxlx, A); maxl = A[N+1]; // left pivot
-  iswap(M, minrx, A); minr = A[M]; // right pivot
-  x = A[N]; // 1st roving variable element
-  middle = A[N] = A[middlex]; // middle pivot
-  iswap(middlex+1, mrx, A); // init MR
 
   register int i, j, lw, up, z; // indices
+  i = N; lw = maxlx; up = minrx; j = M; z = middlex;
+  maxl = A[maxlx]; middle = A[z]; minr = A[minrx];
+
+  // Swap these two segments to the corners
+  for ( k = N1; k <= maxlx; k++ ) {
+    iswap(k, i, A); i++;
+  }
+  i--;
+  for ( k = M1; minrx <= k; k--) {
+    iswap(k, j, A); j--;
+  }
+  j++;
+
+
+  void *x, *y; // values  
+  /* The last element in x must be insert somewhere. The hole
+     location is used for this task */
+  int hole = N; x = A[++i]; // x is the first element to be inserted somewhere
+  A[i] = A[N]; 
 
   // Here the general layout
    /*   L             ML         MR             R
@@ -91,7 +101,13 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
     N     i      lw         z         up     j     M
    */
 
-    /* There are invariants to be maintained (which are >essential< 
+    /* ***********
+       It is actually possible that ML contains an element equal to maxl 
+       and similarly an element in MR equal to minr.
+       ***********
+    */ 
+   /*
+       There are invariants to be maintained (which are >essential< 
      for machine assisted correctness proofs):
      maxl < middle < minr
      If there are two gaps:
@@ -117,7 +133,6 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
      Store its content in y.  Drop x (simplified).  Set x to y and repeat. 
    */
   // Ready to roll ... 
- i = N+1; j = M; z = middlex; lw = z-1; up = z+2; hole = N;
 
    /*   L             ML         MR             R
     o-----]------+[---------]---------]+-----[-----|

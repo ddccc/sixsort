@@ -2,11 +2,6 @@
 // Date: Fri Jan 31 13:32:12 2014, 2017
 // (C) OntoOO/ Dennis de Champeaux
 
-#ifndef C2sort 
-    #define C2sort C2sort.c
-    #include "Qusort.c"
-#endif
-
 const int cut2Limit = 1000;
 
 
@@ -89,7 +84,8 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
   Left:
 	while ( compareXY(A[++I], T) <= 0 ); 
 	AI = A[I];
-	while ( compareXY(T, A[--J]) < 0 ); AJ = A[J];
+	while ( compareXY(T, A[--J]) < 0 ); 
+	AJ = A[J];
 	if ( I < J ) { // swap
 	  A[I] = AJ; A[J] = AI;
 	  goto Left;

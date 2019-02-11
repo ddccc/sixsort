@@ -61,14 +61,18 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
    Inside such a function are often other choices that can be selected.
  */
 
-
-
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <math.h>
 
-// #include "C2fsort.c"
-// #include "C4.c"
+/*
+#include "Hsort.c"
+#include "Dsort.c"
+#include "Qusort.c"
+#include "C2sort.c" 
+#include "C2fsort.c"
+*/
 
 // To avoid compiler warnings:::
 void callQuicksort0(void **AA, int size, int (*compar )());
@@ -88,7 +92,7 @@ void compareQsortAgainstCut2();
 void compareQuicksort0AgainstSixSort();
 void comparePart3AgainstSixSort();
 void compareSixSortAgainstXYZ();
-void iswap();
+// void iswap();
 void insertionsort();
 void quicksort0(void **A, int N, int M, int (*compar )());
 void cut2(void **A, int N, int M, int (*compar )());
@@ -155,11 +159,11 @@ int main (int argc, char *argv[]) {
      // sixsort(0, 0, 0);
   // To check that a sorted array is produced
      // testQuicksort0();
-     // testSixSort(); 
+     testSixSort(); 
      // testQsort();
      // testBentley();
   // validateHeapSort();
-  // validateSixSort();
+     validateSixSort();
   // validateQsort();
   // validateBentley();
   // Measure the sorting time of an algorithm
@@ -172,13 +176,13 @@ int main (int argc, char *argv[]) {
      // ... and uncomment also compareSixsortAgainstXYZ ...
   // Whatever here:::
      // compareQuicksort0AgainstSixSort();
-     // compareCut2AgainstSixSort();
+     // compareCut2AgainstSixSort(); 
      // compareQsortAgainstQuicksort0(); 
      // compareQsortAgainstCut2(); 
      // compareBentleyAgainstSixSort();
      // compareLQAgainstSixSort();
      // compareChenSortAgainstSixSort();
-     comparePart3AgainstSixSort();
+     // comparePart3AgainstSixSort();
      // validateSixSortBT();
      // compareBentleyAgainstSixSort(); // on Bentley test bench
      // comparePart3BAgainstSixSort(); // on Bentley test bench
@@ -261,7 +265,7 @@ void testAlgorithm2(char* label, int siz, void (*alg1)() ) {
 
 // like testAlgorithm0 but the size of array is preset inside testAlgorithm
 void testAlgorithm(char* label, void (*alg1)() ) {
-  testAlgorithm0(label, 1024*1024, alg1);
+  testAlgorithm0(label, 1024*1024 *16, alg1);
   // testAlgorithm0(label, 1024, alg1);
 } // end testAlgorithm0
 
@@ -486,6 +490,8 @@ void timeTest() {
 
 // callCut2 is not used by sixsort; it is employed by UseSixSort.c
 // for cut2 testing. 
+
+
 void callCut2(void **A, int size, 
 	int (*compar ) (const void *, const void * ) ) {
   cut2f(A, 0, size-1, compar);
@@ -585,8 +591,8 @@ void compareAlgorithms2(char *label, int siz, int seedLimit,
  } // end compareAlgorithms2
 
 void compareAlgorithms(char *label, void (*alg1)(), void (*alg2)() ) {
-  // compareAlgorithms0(label, 1024, 32 * 1024, alg1, alg2);
-  compareAlgorithms0(label, 16 * 1024 * 1024, 4, alg1, alg2);
+  compareAlgorithms0(label, 1024, 32 * 1024, alg1, alg2);
+  // compareAlgorithms0(label, 16 * 1024 * 1024, 4, alg1, alg2);
   // compareAlgorithms0(label, 1024 * 1024, 32, alg1, alg2);
 } // end compareAlgorithms
 
@@ -606,6 +612,7 @@ void compareCut2AgainstSixSort() {
   void sixsort(), callCut2();
   compareAlgorithms("Compare cut2 vs sixsort", callCut2, sixsort);
 } // end compareCut2AgainstSixsort 
+
 
 void callQuicksort0(void **A, int size, 
 	int (*compar ) (const void *, const void * ) ) {
@@ -1317,6 +1324,16 @@ void Adp_SymPSort(void *a, int n, int es, int (*cmp)(const void *,const void *))
     if(left < n) SymPartitionSort((char *)a, left, n, es, cmp);
 } // end Adp_SymPSort
 
+// ************************************************************************
+
+void iswap3(int p, int q, void **A) {
+  void *t = A[p];
+  A[p] = A[q];
+  A[q] = t;
+} // end of iswap3
+
+#define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
+
 void callPart3(void **A, int size, int (*compare)()) {
   part3(A, 0, size-1, compare);
 }
@@ -1339,20 +1356,20 @@ Again:
     int e = L/6;
     int mid = left + L/2;
                                // B[0] = A[left]; 
-    iswap(left+1, left+e, A);  // B[1] = A[left+e]; 
-    iswap(left+2, mid-e, A);   // B[2] = A[mid-e];
-    iswap(left+3, mid, A);     // B[3] = A[mid];
-    iswap(left+4, mid+e, A);   // B[4] = A[mid+e]; 
-    iswap(left+5, right-e, A); // B[5] = A[right-e]; 
-    iswap(left+6, right, A);   // B[6] = A[right];
+    iswap3(left+1, left+e, A);  // B[1] = A[left+e]; 
+    iswap3(left+2, mid-e, A);   // B[2] = A[mid-e];
+    iswap3(left+3, mid, A);     // B[3] = A[mid];
+    iswap3(left+4, mid+e, A);   // B[4] = A[mid+e]; 
+    iswap3(left+5, right-e, A); // B[5] = A[right-e]; 
+    iswap3(left+6, right, A);   // B[6] = A[right];
     // insertionSortB(B, 0, 6);
     insertionsort(A, left, left + 6, compar);
     // A[left] = B[0]; A[left+e] = B[1]; A[mid-e] = B[2];
     // A[mid] = B[3];
     // A[mid+e] = B[4]; A[right-e] = B[5]; A[right] = B[6];
-    iswap(left, left+1, A); // iswap(left, left+e, A);   // -> p
-    iswap(left+1, left+3, A); // iswap(left+1, mid, A);    // -> q
-    iswap(right, left+5, A);// iswap(right, right-e, A); // -> r 
+    iswap3(left, left+1, A); // iswap(left, left+e, A);   // -> p
+    iswap3(left+1, left+3, A); // iswap(left+1, mid, A);    // -> q
+    iswap3(right, left+5, A);// iswap(right, right-e, A); // -> r 
 
     int a = left + 2; int b = a;
     int c = right - 1; int d = c;
@@ -1407,7 +1424,7 @@ Again:
     } 
     a--; b--; c++; d++;
     // swap(A[left + 1],A[a]); swap(A[a],A[b]);
-    iswap(left+1, a, A); iswap(a, b, A);
+    iswap3(left+1, a, A); iswap(a, b, A);
     a--;
     // swap(A[left],A[a]); swap(A[right],A[d]);
     iswap(left, a, A); iswap(right, d, A);
@@ -1469,7 +1486,8 @@ void tweakSort(void **AA, int n) {
   compareXY = compareIntVal;
   cut4(0, n-1);
   */
-  callCut2(AA, n, compareIntVal);
+  callQuicksort0(AA, n, compareIntVal);
+  
 } // end tweakSort
 void dither(void **A, int n) {
   int k;

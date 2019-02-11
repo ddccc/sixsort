@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2012, Dennis de Champeaux.  All rights reserved.
 
@@ -72,21 +71,17 @@ char* expiration = "*** License for sixsort has expired ...\n";
 int sleepingThreads = 0;
 int NUMTHREADS;
 
-/*
-#include "Isort.c"
-#include "Hsort.c"
-#include "Qusort.c"
-#include "Dsort.c"
-#include "C2sort.c"
-*/
-
-#include "C2fsort.c" 
-#include "Qstack.c"
 
 struct stack *ll;
 struct task *newTask();
+
 void addTaskSynchronized();
 
+#include "Qusort.c"
+#include "C2sort.c" 
+#include "C2fsort.c"
+
+#include "Qstack.c"
 #include "C4p.c"
 
 void *myMallocSS(char* location, int size) {
@@ -260,7 +255,7 @@ void sixsort(void **A, int size,
   // compareXY = compar;
 
   if ( size <= cut2SLimit || numberOfThreads <= 1) {
-    cut2(A, 0, size-1, compareXY);
+    quicksort0(A, 0, size-1, compareXY);
     return;
   }
   sleepingThreads = 0;
@@ -347,12 +342,14 @@ void sixsort(void **A, int size,
       // swap the two middle segments
       if ( b <= c ) {
 	// printf("b <= c\n");
-	for ( k = 0; k < b; k++ ) iswap(e3-k, i2-k, A);
+	for ( k = 0; k < b; k++ ) // iswap(e3-k, i2-k, A);
+	  { int xx = e3-k, yy = i2-k; iswap(xx, yy, A); } 
 	m3 = i2 - b;
       }
       else {
 	// printf("c < b\n");
-	for ( k = 0; k < c+1; k++ ) iswap(middle2+k, i1+1+k, A);
+	for ( k = 0; k < c+1; k++ ) // iswap(middle2+k, i1+1+k, A);
+	  { int xx = middle2+k, yy = i1+1+k; iswap(xx, yy, A); } 
 	m3 = i1 + c+1;
       }
     }

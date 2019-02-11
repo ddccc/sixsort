@@ -5,6 +5,11 @@
 int cut4Limit = 3000;
 int probeParamCut4 = 1000000;
 
+#ifndef Qusort 
+    #include "Qusort.c"
+    #define Qusort Qusort.c
+#endif
+
 void cut4Pc();
 // cut4P is doing 4-partitioning using 3 pivots
 void cut4P(void **A, int N, int M, int (*compar)()) {
@@ -12,7 +17,8 @@ void cut4P(void **A, int N, int M, int (*compar)()) {
   int L = M - N; 
   // cut4Pc(N, M, 0); return; // for testing heapsort
   if ( L < cut4Limit ) {
-    cut2f(A, N, M, compar); 
+    // cut2f(A, N, M, compar); 
+    quicksort0(A, N, M, compar); 
     return; 
   }
   int depthLimit = 2.5 * floor(log(L));
@@ -29,7 +35,8 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
   }
   int L = M - N; 
   if ( L < cut4Limit ) {
-    cut2fc(A, N, M, depthLimit, compareXY); 
+    // cut2fc(A, N, M, depthLimit, compareXY); 
+    quicksort0c(A, N, M, depthLimit, compareXY); 
     return; 
   }
   depthLimit--;
@@ -50,7 +57,10 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
 
   // assemble the mini array [N1, M1]  
   int k;
-  for (k = 0; k < probeLng; k++) iswap(N1 + k, N + k * offset, A);
+  // for (k = 0; k < probeLng; k++) iswap(N1 + k, N + k * offset, A);
+  for (k = 0; k < probeLng; k++) {
+    int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A);
+  }
   // sort this mini array to obtain good pivots
   // cut2(A, N1, M1, compareXY);
  quicksort0(A, N1, M1, compareXY); 
@@ -67,11 +77,14 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
   void *x, *y; // values  
   int hole;
 
-  iswap(N+1, maxlx, A); maxl = A[N+1]; // left pivot
+  // iswap(N+1, maxlx, A); maxl = A[N+1]; // left pivot
+  { int xx = N+1; iswap(xx, maxlx, A); maxl = A[xx]; } 
   iswap(M, minrx, A); minr = A[M]; // right pivot
   x = A[N]; // 1st roving variable element
   middle = A[N] = A[middlex]; // middle pivot
-  iswap(middlex+1, mrx, A); // init MR
+  // iswap(middlex+1, mrx, A); // init MR
+  { int xx = middlex+1; iswap(xx, mrx, A); }
+
 
   register int i, j, lw, up, z; // indices
 

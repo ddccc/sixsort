@@ -2,12 +2,15 @@
 // Date: Fri Jan 31 13:22:27 2014
 // (C) OntoOO/ Dennis de Champeaux
 
-
+/*
 void iswap(int p, int q, void **A) {
   void *t = A[p];
   A[p] = A[q];
   A[q] = t;
 } // end of iswap
+*/
+
+#define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
 
 void heapSort();
 void heapc(void **A, int N, int M, int (*compare)()) {
