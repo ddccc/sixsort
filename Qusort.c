@@ -4,6 +4,7 @@
 
 #include "Hsort.c"
 #include "Dsort.c"
+#include "Isort.c"
 
 // calculate the median of 3
 int med(void **A, int a, int b, int c,
@@ -20,6 +21,7 @@ void vswap(void **A, int N, int N3, int eq) {
 }
 
 const int small = 120;
+// const int small = 343;
 void quicksort0c();
 // Quicksort function for invoking quicksort0c.
 void quicksort0(void **A, int N, int M, int (*compare)()) {
@@ -54,6 +56,7 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
     depthLimit--;
 
     // 7 <= L
+
     int p0 = N + (L>>1); // N + L/2;
     if ( 7 < L ) {
       int pn = N;
@@ -66,6 +69,8 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       }
       p0 = med(A, pn, p0, pm, compareXY);
     }
+
+
 
     /* optional check when inputs have many equal elements
     if ( compareXY(A[N], A[M]) == 0 ) {

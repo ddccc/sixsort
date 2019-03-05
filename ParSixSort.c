@@ -79,7 +79,7 @@ void addTaskSynchronized();
 
 #include "Qusort.c"
 #include "C2sort.c" 
-#include "C2fsort.c"
+// #include "C2fsort.c"
 
 #include "Qstack.c"
 #include "C4p.c"

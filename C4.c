@@ -2,13 +2,8 @@
 // Date: Thu Jan 26 14:34:54 2017
 // (C) OntoOO/ Dennis de Champeaux
 
-// Source of cut4
+const int cut4Limit = 448; // transition to 1-pivot
 
-const int cut4Limit = 3000;
-
-// Here more global entities used throughout
-// int (*compareXY)();
-// void **A;
 
 void cut4c();
 // cut4 is doing 4-partitioning using 3 pivots
@@ -36,58 +31,109 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
   // printf("cut4c %d %d  %d\n", N, M, depthLimit);
   int L = M - N; 
   if ( L < cut4Limit ) {
-    // cut2fc(A, N, M, depthLimit, compareXY); 
+    // cut2fc(A, N, M, depthLimit, compareXY);  // alternative
     quicksort0c(A, N, M, depthLimit, compareXY); 
     return; 
   }
   depthLimit--;
 
+  int k, N1, M1; // for sampling
+  int maxlx, middlex, mrx, minrx;  
   // pivots for left/ middle / right regions
   register void *maxl, *middle, *minr;   
+  register int i, j, lw, up, z; // indices
+  i = N; j = M;
+  z = middlex = N + (L>>1); // N + L/2
 
-  // int probeLng = ( L < 130000 ? 20 : sqrt(L*1.0)/ 15.0 );
-  // int probeLng = ( L < 130000 ? 24 : sqrt(L*1.0)/ 14.0 );
-  // int probeLng = ( L < 130000 ? 28 : sqrt(L*1.0)/ 14.0 );
-  int probeLng = ( L < 130000 ? 32 : sqrt(L*1.0)/ 14.0 );
-  int halfSegmentLng = probeLng >> 1; // probeLng/2;
-  int N1 = N + (L>>1) - halfSegmentLng;
-  int M1 = N1 + probeLng - 1;
-  int quartSegmentLng = probeLng >> 2; // probeLng/4;
-  int maxlx = N1 + quartSegmentLng;
-  int middlex = N1 + halfSegmentLng;
-  int minrx = M1 - quartSegmentLng;
-  int mrx = middlex + (quartSegmentLng>>1);
-  int offset = L/probeLng;  
+  const int small = 4000; 
+  if ( L < small ) { // use 5 elements for sampling
+    int e1, e2, e3, e4, e5;
+    e1 = maxlx = N; e5 = minrx = M; mrx = middlex+1;
+    e3 = middlex;
+    int quartSegmentLng = L >> 2; // L/4
+    e2 = e3 - quartSegmentLng;
+    e4 = e3 + quartSegmentLng;
+    void *ae1 = A[e1], *ae2 = A[e2], *ae3 = A[e3], *ae4 = A[e4], *ae5 = A[e5];
+    void *t;
+    // if (ae1 > ae2) { t = ae1; ae1 = ae2; ae2 = t; }
+    if ( 0 < compareXY(ae1, ae2) ) { t = ae1; ae1 = ae2; ae2 = t; } // 1-2
+    if ( 0 < compareXY(ae4, ae5) ) { t = ae4; ae4 = ae5; ae5 = t; } // 4-5
+    if ( 0 < compareXY(ae1, ae3) ) { t = ae1; ae1 = ae3; ae3 = t; } // 1-3
+    if ( 0 < compareXY(ae2, ae3) ) { t = ae2; ae2 = ae3; ae3 = t; } // 2-3
+    if ( 0 < compareXY(ae1, ae4) ) { t = ae1; ae1 = ae4; ae4 = t; } // 1-4
+    if ( 0 < compareXY(ae3, ae4) ) { t = ae3; ae3 = ae4; ae4 = t; } // 3-4
+    if ( 0 < compareXY(ae2, ae5) ) { t = ae2; ae2 = ae5; ae5 = t; } // 2-5
+    if ( 0 < compareXY(ae2, ae3) ) { t = ae2; ae2 = ae3; ae3 = t; } // 2-3
+    if ( 0 < compareXY(ae4, ae5) ) { t = ae4; ae4 = ae5; ae5 = t; } // 4-5
+    // ... and reassign
+    A[e1] = ae1; A[e2] = ae2; A[e3] = ae3; A[e4] = ae4; A[e5] = ae5;
+    iswap(mrx, e4, A);
+    lw = z-1; up = mrx+1;
+    /* 
+  } else if ( 9 == probeLng ) { // found no use for 9-elements sampling 
+    N1 = maxlx = middlex - 4;
+    M1 = minrx = middlex + 4;
+    mrx = middlex + 2;
+    int offset = L/probeLng;
+    // assemble the mini array [N1, M1]
+    for (k = 1; k <= 4; k++) // iswap(middlex + k, middlex + k * offset, A)  
+      { int xx = middlex + k, yy = middlex + k * offset; iswap(xx, yy, A); }
+    for (k = 1; k <= 4; k++) // iswap(middlex - k, middlex - k * offset, A)  
+      { int xx = middlex - k, yy = middlex - k * offset; iswap(xx, yy, A); }
+    quicksort0(A, N1, M1, compareXY); 
+    */
+  } else { // small <= L
+    int probeLng = sqrt(L); 
+    int halfSegmentLng = probeLng >> 1; // probeLng/2;
+    int quartSegmentLng = probeLng >> 2; // probeLng/4;
+    N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
+    M1 = N1 + probeLng - 1;
+    maxlx = N1 + quartSegmentLng;
+    // int middlex = N1 + halfSegmentLng;
+    minrx = M1 - quartSegmentLng;
+    mrx = middlex + (quartSegmentLng>>1);
+    int offset = L/probeLng;  
 
-  // assemble the mini array [N1, M1]
-  int k;
-  for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
+    // assemble the mini array [N1, M1]
+    for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
     { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
-  // sort this mini array to obtain good pivots
-  quicksort0(A, N1, M1, compareXY); 
+    // sort this mini array to obtain good pivots
+    quicksort0(A, N1, M1, compareXY); 
+    lw = maxlx; up = minrx;
+  }
 
-  if ( compareXY(A[maxlx], A[middlex]) == 0 || 
-       compareXY(A[middlex], A[mrx]) == 0 || 
-       compareXY(A[mrx], A[minrx]) == 0 ) {
+  // pivots
+  maxl = A[maxlx]; middle = A[z]; minr = A[minrx];
+
+  // check that segments can be properly initialized
+  if ( compareXY(maxl, middle) == 0 || 
+       compareXY(middle, A[mrx]) == 0 || 
+       compareXY(A[mrx], minr) == 0 ) {
     // no good pivots available, thus escape
     dflgm(A, N, M, middlex, cut4c, depthLimit, compareXY);
     return;
   }
 
-  register int i, j, lw, up, z; // indices
-  i = N; lw = maxlx; up = minrx; j = M; z = middlex;
-  maxl = A[maxlx]; middle = A[z]; minr = A[minrx];
-
-  // Swap these two segments to the corners
-  for ( k = N1; k <= maxlx; k++ ) {
-    iswap(k, i, A); i++;
+  if ( small  <= L) {
+    // Swap these two segments to the corners
+    for ( k = N1; k <= maxlx; k++ ) {
+      iswap(k, i, A); i++;
+    }
+    i--;
+    for ( k = M1; minrx <= k; k--) {
+      iswap(k, j, A); j--;
+    }
+    j++;
+  } 
+  /* obsolete
+  else if ( 9 == probeLng ) {
+    // init segments
+    up = mrx; mrx--;; 
+    iswap(up, mrx, A);
+    lw = middlex - 1; 
+    iswap(N, maxlx, A); iswap(M, minrx, A);
   }
-  i--;
-  for ( k = M1; minrx <= k; k--) {
-    iswap(k, j, A); j--;
-  }
-  j++;
-
+  */
 
   void *x, *y; // values  
   /* The last element in x must be insert somewhere. The hole

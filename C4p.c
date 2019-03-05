@@ -2,13 +2,7 @@
 // Date: Thu Jan 26 16:26:00 2017
 // (C) Dennis de Champeaux/ OntoOO
 
-int cut4Limit = 3000;
-int probeParamCut4 = 1000000;
-
-#ifndef Qusort 
-    #include "Qusort.c"
-    #define Qusort Qusort.c
-#endif
+int cut4Limit = 3000; // transition to 1-pivot
 
 void cut4Pc();
 // cut4P is doing 4-partitioning using 3 pivots
@@ -41,52 +35,89 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
   }
   depthLimit--;
 
-  register void *maxl, *middle, *minr; // pivots for left/ middle / right regions
+  int k, N1, M1; // for sampling
+  int maxlx, middlex, mrx, minrx;  
+  // pivots for left/ middle / right regions
+  register void *maxl, *middle, *minr;
+  register int i, j, lw, up, z; // indices
+  i = N; j = M;
+  z = middlex = N + (L>>1); // N + L/2
 
-  int probeLng = L/ probeParamCut4;
-  if ( probeLng < 20 ) probeLng = 20; // quite short indeed
-  int halfSegmentLng = probeLng >> 1; // probeLng/2;
-  int N1 = N + (L>>1) - halfSegmentLng;
-  int M1 = N1 + probeLng - 1;
-  int quartSegmentLng = probeLng >> 2; // probeLng/4;
-  int maxlx = N1 + quartSegmentLng;
-  int middlex = N1 + halfSegmentLng;
-  int minrx = M1 - quartSegmentLng;
-  int mrx = middlex + (quartSegmentLng>>1);
-  int offset = L/probeLng;  
+  const int small = 4000; 
+  if ( L < small ) { // use 5 elements for sampling
+    int e1, e2, e3, e4, e5;
+    e1 = maxlx = N; e5 = minrx = M; mrx = middlex+1;
+    e3 = middlex;
+    int quartSegmentLng = L >> 2; // L/4
+    e2 = e3 - quartSegmentLng;
+    e4 = e3 + quartSegmentLng;
+    void *ae1 = A[e1], *ae2 = A[e2], *ae3 = A[e3], *ae4 = A[e4], *ae5 = A[e5];
+    void *t;
+    // if (ae1 > ae2) { t = ae1; ae1 = ae2; ae2 = t; }
+    if ( 0 < compareXY(ae1, ae2) ) { t = ae1; ae1 = ae2; ae2 = t; } // 1-2
+    if ( 0 < compareXY(ae4, ae5) ) { t = ae4; ae4 = ae5; ae5 = t; } // 4-5
+    if ( 0 < compareXY(ae1, ae3) ) { t = ae1; ae1 = ae3; ae3 = t; } // 1-3
+    if ( 0 < compareXY(ae2, ae3) ) { t = ae2; ae2 = ae3; ae3 = t; } // 2-3
+    if ( 0 < compareXY(ae1, ae4) ) { t = ae1; ae1 = ae4; ae4 = t; } // 1-4
+    if ( 0 < compareXY(ae3, ae4) ) { t = ae3; ae3 = ae4; ae4 = t; } // 3-4
+    if ( 0 < compareXY(ae2, ae5) ) { t = ae2; ae2 = ae5; ae5 = t; } // 2-5
+    if ( 0 < compareXY(ae2, ae3) ) { t = ae2; ae2 = ae3; ae3 = t; } // 2-3
+    if ( 0 < compareXY(ae4, ae5) ) { t = ae4; ae4 = ae5; ae5 = t; } // 4-5
+    // ... and reassign
+    A[e1] = ae1; A[e2] = ae2; A[e3] = ae3; A[e4] = ae4; A[e5] = ae5;
+    iswap(mrx, e4, A);
+    lw = z-1; up = mrx+1;
+  } else { // small <= L
+    int probeLng = sqrt(L);
+    int halfSegmentLng = probeLng >> 1; // probeLng/2;
+    int quartSegmentLng = probeLng >> 2; // probeLng/4;
+    N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
+    M1 = N1 + probeLng - 1;
+    maxlx = N1 + quartSegmentLng;
+    // int middlex = N1 + halfSegmentLng;
+    minrx = M1 - quartSegmentLng;
+    mrx = middlex + (quartSegmentLng>>1);
+    int offset = L/probeLng;  
 
-  // assemble the mini array [N1, M1]  
-  int k;
-  // for (k = 0; k < probeLng; k++) iswap(N1 + k, N + k * offset, A);
-  for (k = 0; k < probeLng; k++) {
-    int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A);
+    // assemble the mini array [N1, M1]
+    for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
+    { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
+    // sort this mini array to obtain good pivots
+    quicksort0(A, N1, M1, compareXY); 
+    lw = maxlx; up = minrx;
   }
-  // sort this mini array to obtain good pivots
-  // cut2(A, N1, M1, compareXY);
- quicksort0(A, N1, M1, compareXY); 
 
+  // pivots
+  maxl = A[maxlx]; middle = A[z]; minr = A[minrx];
 
-  if ( compareXY(A[maxlx], A[middlex]) == 0 || 
-       compareXY(A[middlex], A[mrx]) == 0 || 
-       compareXY(A[mrx], A[minrx]) == 0 ) {
+  // check that segments can be properly initialized
+  if ( compareXY(maxl, middle) == 0 || 
+       compareXY(middle, A[mrx]) == 0 || 
+       compareXY(A[mrx], minr) == 0 ) {
     // no good pivots available, thus escape
     dflgm(A, N, M, middlex, cut4Pc, depthLimit, compareXY);
     return;
   }
-  
-  void *x, *y; // values  
-  int hole;
 
-  // iswap(N+1, maxlx, A); maxl = A[N+1]; // left pivot
-  { int xx = N+1; iswap(xx, maxlx, A); maxl = A[xx]; } 
-  iswap(M, minrx, A); minr = A[M]; // right pivot
-  x = A[N]; // 1st roving variable element
-  middle = A[N] = A[middlex]; // middle pivot
-  // iswap(middlex+1, mrx, A); // init MR
-  { int xx = middlex+1; iswap(xx, mrx, A); }
+  if ( small  <= L) {
+    // Swap these two segments to the corners
+    for ( k = N1; k <= maxlx; k++ ) {
+      iswap(k, i, A); i++;
+    }
+    i--;
+    for ( k = M1; minrx <= k; k--) {
+      iswap(k, j, A); j--;
+    }
+    j++;
+  } 
 
 
-  register int i, j, lw, up, z; // indices
+  void *x, *y; // values 
+  /* The last element in x must be insert somewhere. The hole
+     location is used for this task */
+  int hole = N; x = A[++i]; // x is the first element to be inserted somewhere
+  A[i] = A[N];
+
 
   // Here the general layout:
    /*   L             ML         MR             R
@@ -94,7 +125,11 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
     N     i      lw         z         up     j     M
    */
 
-  
+      /* ***********
+       It is actually possible that ML contains an element equal to maxl 
+       and similarly an element in MR equal to minr.
+       ***********
+    */ 
   /* There are invariants to be maintained (which are >essential< 
      for machine assisted correctness proofs):
      maxl < middle < minr
@@ -121,13 +156,10 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
    */
   // Ready to roll ...
 
-  i = N+1; j = M; z = middlex; lw = z-1; up = z+2; hole = N;
-
    /*   L             ML         MR             R
     o-----]------+[---------]---------]+-----[-----|
     N     i      lw         z         up     j     M
    */
-
 
   // if ( x <= middle ) {
   if ( compareXY(x, middle) <= 0 ) {

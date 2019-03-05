@@ -1,5 +1,4 @@
 /* 
-
 Copyright (c) 2012, Dennis de Champeaux.  All rights reserved.
 
 The copyright holders hereby grant to any person obtaining a copy of
@@ -68,7 +67,7 @@ char* expiration = "*** License for sixsort has expired ...\n";
 
 #include "Qusort.c"
 #include "C2sort.c" 
-#include "C2fsort.c"
+
 
 #include "c4.c"
  
@@ -115,6 +114,7 @@ void sixsort(void **AA, int size,
   // Proceed !
   // A = AA;
   // compareXY = compar;
+  // printf("********** start sixsort ***************\n");
   cut4(AA, 0, size-1, compar);
 }
 /* compile with: 

@@ -66,13 +66,6 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include <stdlib.h>
 #include <math.h>
 
-/*
-#include "Hsort.c"
-#include "Dsort.c"
-#include "Qusort.c"
-#include "C2sort.c" 
-#include "C2fsort.c"
-*/
 
 // To avoid compiler warnings:::
 void callQuicksort0(void **AA, int size, int (*compar )());
@@ -96,7 +89,7 @@ void compareSixSortAgainstXYZ();
 void insertionsort();
 void quicksort0(void **A, int N, int M, int (*compar )());
 void cut2(void **A, int N, int M, int (*compar )());
-void cut2f(void **A, int N, int M, int (*compar )());
+// void cut2f(void **A, int N, int M, int (*compar )());
 void cut4(void **A, int N, int M, int (*compar )());
 void sixsort(void **A, int size, 
 	      int (*compar ) (const void *, const void * ));
@@ -266,7 +259,7 @@ void testAlgorithm2(char* label, int siz, void (*alg1)() ) {
 // like testAlgorithm0 but the size of array is preset inside testAlgorithm
 void testAlgorithm(char* label, void (*alg1)() ) {
   testAlgorithm0(label, 1024*1024 *16, alg1);
-  // testAlgorithm0(label, 1024, alg1);
+  // testAlgorithm0(label, 10*1024, alg1);
 } // end testAlgorithm0
 
 // /* Example: use of testAlgorithm
@@ -494,7 +487,7 @@ void timeTest() {
 
 void callCut2(void **A, int size, 
 	int (*compar ) (const void *, const void * ) ) {
-  cut2f(A, 0, size-1, compar);
+  cut2(A, 0, size-1, compar);
 } // end callCut2
 
 // Report the speed fraction of two algorithms on a range of array sizes
