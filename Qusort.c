@@ -166,14 +166,13 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       I++; 
       goto Skip;
     }
-    if ( I < J ) { // swap
-      A[J] = A[I]; A[I] = AJ;
-      if ( I+1 == J ) {
-	J--; I++;
-	goto Skip;
-      }
-    } else { // J+1 = I }
-      goto Skip; 
+    if ( J < I ) // J+1 = I
+      goto Skip;
+    // I < J   swap
+    A[J] = A[I]; A[I] = AJ;
+    if ( I+1 == J ) {
+      J--; I++;
+      goto Skip;
     }
     // fall through
 

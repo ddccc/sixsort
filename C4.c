@@ -2,8 +2,9 @@
 // Date: Thu Jan 26 14:34:54 2017
 // (C) OntoOO/ Dennis de Champeaux
 
-const int cut4Limit = 448; // transition to 1-pivot
-
+// const int cut4Limit = 1300; // 4.08229e+08 clocktime 26012
+const int cut4Limit = 1200; // 4.08643e+08 clocktime 25984
+// const int cut4Limit = 1100; // 4.09092e+08 clocktime 26018
 
 void cut4c();
 // cut4 is doing 4-partitioning using 3 pivots
@@ -11,8 +12,8 @@ void cut4(void **A, int N, int M, int (*compareXY)()) {
   // printf("cut4 %d %d \n", N, M);
   int L = M - N; 
   if ( L < cut4Limit ) {
-    // cut2f(A, N, M, compareXY); 
-    quicksort0(A, N, M, compareXY); 
+    cut2(A, N, M, compareXY); 
+    // quicksort0(A, N, M, compareXY); 
     return; 
   }
   // cut4c(N, M, 0); return; // for testing heapsort
@@ -31,8 +32,8 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
   // printf("cut4c %d %d  %d\n", N, M, depthLimit);
   int L = M - N; 
   if ( L < cut4Limit ) {
-    // cut2fc(A, N, M, depthLimit, compareXY);  // alternative
-    quicksort0c(A, N, M, depthLimit, compareXY); 
+    cut2c(A, N, M, depthLimit, compareXY);  // alternative
+    // quicksort0c(A, N, M, depthLimit, compareXY); 
     return; 
   }
   depthLimit--;
@@ -45,7 +46,12 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
   i = N; j = M;
   z = middlex = N + (L>>1); // N + L/2
 
-  const int small = 4000; 
+  // const int small = 4200; // 4.09396e+08 clocktime 26003
+  // const int small = 4100; // 4.09022e+08 clocktime 25996
+  const int small = 4000; // 4.08643e+08 clocktime 25984
+  // const int small = 3900; // 4.08284e+08 clocktime 26034
+  // const int small = 3800; // 4.07916e+08 clocktime 26053
+
   if ( L < small ) { // use 5 elements for sampling
     int e1, e2, e3, e4, e5;
     e1 = maxlx = N; e5 = minrx = M; mrx = middlex+1;
@@ -98,7 +104,17 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
     for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
     { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
     // sort this mini array to obtain good pivots
-    quicksort0(A, N1, M1, compareXY); 
+    if ( probeLng < 120 ) quicksort0c(A, N1, M1, depthLimit, compareXY); else {
+      // protect against constant arrays
+      int p0 = N1 + (probeLng>>1);
+      int pn = N1, pm = M1, d = (probeLng-3)>>3;
+      pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
+      p0 = med(A, p0 - d, p0, p0 + d, compareXY);
+      pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
+      p0 = med(A, pn, p0, pm, compareXY);
+      dflgm(A, N1, M1, p0, quicksort0c, depthLimit, compareXY);
+    }
+
     lw = maxlx; up = minrx;
   }
 
