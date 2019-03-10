@@ -2,8 +2,12 @@
 // Date: Thu Jan 26 14:34:54 2017
 // (C) OntoOO/ Dennis de Champeaux
 
-// const int cut4Limit = 1300; // 4.08229e+08 clocktime 26012
-const int cut4Limit = 1200; // 4.08643e+08 clocktime 25984
+// const int cut4Limit = 1550; // 4.07426e+08 clocktime 9024
+// const int cut4Limit = 1500; // 4.07551e+08 clocktime 9003
+// const int cut4Limit = 1450; // 4.07670e+08 clocktime 9018 ?? 9031
+const int cut4Limit = 1400; // 4.07808e+08 clocktime 9003
+// const int cut4Limit = 1300; // 4.08088e+08 clocktime 9009
+// const int cut4Limit = 1200; // 4.08388e+08 clocktime 9012
 // const int cut4Limit = 1100; // 4.09092e+08 clocktime 26018
 
 void cut4c();
@@ -89,7 +93,7 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
     quicksort0(A, N1, M1, compareXY); 
     */
   } else { // small <= L
-    int probeLng = sqrt(L); 
+    int probeLng = sqrt(L/6); 
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
     N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;

@@ -2,11 +2,12 @@
 // Date: Fri Jan 31 13:32:12 2014, 2017 Sun Mar 03 16:14:28 2019
 // (C) OntoOO/ Dennis de Champeaux
 
-// const int cut2Limit =  1000; // 4.08329e+08 clocktime 30052
-const int cut2Limit =  950; // 4.0836e+08 clocktime 29996
-// const int cut2Limit =  900;  // 4.08377e+08 clocktime 30003
-// const int cut2Limit =  800; // 4.08418e+08 clocktime 30021
-// const int cut2Limit =  700; // 4.08483e+08 clocktime 30021
+// const int cut2Limit =  1200; // 4.05546e+08 clocktime 9884
+const int cut2Limit =  1150;    // 4.05561e+08 clocktime 9834
+// const int cut2Limit =  1100; // 4.05584e+08 clocktime 9840
+// const int cut2Limit =  1000; // 4.05635e+08 clocktime 9843
+// const int cut2Limit =  950;  // 4.05656e+08 clocktime 9856
+
 
 
 void cut2c();
@@ -92,7 +93,7 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
     int k, N1, M1; // for sampling
     // int middlex = N + (L>>1); // N + L/2
 
-    int probeLng = sqrt(L);
+    int probeLng = sqrt(L/9);
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
     N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;

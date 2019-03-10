@@ -2,7 +2,7 @@
 // Date: Thu Jan 26 16:26:00 2017
 // (C) Dennis de Champeaux/ OntoOO
 
-int cut4Limit = 1200; // transition to 1-pivot
+int cut4Limit = 1400; // transition to 1-pivot
 
 void cut4Pc();
 // cut4P is doing 4-partitioning using 3 pivots
@@ -68,7 +68,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
     iswap(mrx, e4, A);
     lw = z-1; up = mrx+1;
   } else { // small <= L
-    int probeLng = sqrt(L);
+    int probeLng = sqrt(L/6);
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
     N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
