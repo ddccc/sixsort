@@ -15,19 +15,21 @@ void cut4P(void **A, int N, int M, int (*compar)()) {
     quicksort0(A, N, M, compar); 
     return; 
   }
-  int depthLimit = 2.5 * floor(log(L));
+  int depthLimit = 1 + 2.5 * floor(log(L));
   cut4Pc(A, N, M, depthLimit, compar);
 } // end cut4P
 
 void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) 
 {
+  int L; 
  Start:
   // printf("cut4Pc %d %d  %d\n", N, M, depthLimit);
+  int L = M - N; 
+  if ( L <= 0 ) return;
   if ( depthLimit <= 0 ) {
     heapc(A, N, M, compareXY);
     return;
   }
-  int L = M - N; 
   if ( L < cut4Limit ) {
     // cut2fc(A, N, M, depthLimit, compareXY); 
     quicksort0c(A, N, M, depthLimit, compareXY); 

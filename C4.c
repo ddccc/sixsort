@@ -21,20 +21,22 @@ void cut4(void **A, int N, int M, int (*compareXY)()) {
     return; 
   }
   // cut4c(N, M, 0); return; // for testing heapsort
-  int depthLimit = 2.5 * floor(log(L));
+  int depthLimit = 1 + 2.5 * floor(log(L));
   cut4c(A, N, M, depthLimit, compareXY);
 } // end cut4
 
 
 void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)()) 
 {
+  int L;
  Start:
+  L = M - N; 
+  // printf("cut4c %d %d  %d\n", N, M, depthLimit);
+  if ( L <= 0 ) return;
   if ( depthLimit <= 0 ) {
     heapc(A, N, M, compareXY);
     return;
   }
-  // printf("cut4c %d %d  %d\n", N, M, depthLimit);
-  int L = M - N; 
   if ( L < cut4Limit ) {
     cut2c(A, N, M, depthLimit, compareXY);  // alternative
     // quicksort0c(A, N, M, depthLimit, compareXY); 
