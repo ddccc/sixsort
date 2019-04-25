@@ -77,6 +77,11 @@ struct task *newTask();
 
 void addTaskSynchronized();
 
+// /*
+#include "Hsort.c"
+#include "Dsort.c"
+#include "Isort.c"
+// */
 #include "Qusort.c"
 #include "C2sort.c" 
 // #include "C2fsort.c"

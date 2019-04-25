@@ -24,7 +24,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
   int L; 
  Start:
   // printf("cut4Pc %d %d  %d\n", N, M, depthLimit);
-  int L = M - N; 
+  L = M - N +1; 
   if ( L <= 0 ) return;
   if ( depthLimit <= 0 ) {
     heapc(A, N, M, compareXY);

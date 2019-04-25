@@ -2,9 +2,11 @@
 // Date: Fri Jan 31 13:32:12 2014/ Tue May 19 15:02:00 2015, 2017
 // (C) OntoOO/ Dennis de Champeaux
 
-#include "Hsort.c"
-#include "Dsort.c"
-#include "Isort.c"
+// #include "Hsort.c"
+// #include "Dsort.c"
+// #include "Isort.c"
+
+void quicksort0c(void **, int, int, int, int (*)(const void*, const void*));
 
 // calculate the median of 3
 int med(void **A, int a, int b, int c,
@@ -20,12 +22,10 @@ void vswap(void **A, int N, int N3, int eq) {
   while ( 0 < eq ) { eq--; t = A[N]; A[N++] = A[N3]; A[N3++] = t; }
 }
 
-const int small = 120;
-// const int small = 343;
-void quicksort0c();
+const int small = 400;
 // Quicksort function for invoking quicksort0c.
-void quicksort0(void **A, int N, int M, int (*compare)()) {
-  //  printf("quicksort0 N %i M %i \n", N, M);
+void quicksort0(void **A, int N, int M, int (*compare)(const void*, const void*)) {
+  //  printf("quicksort0 N %i M %i L %i\n", N, M, M-N);
   int L = M - N;
   if ( L <= 0 ) return;
   if ( L < 7 ) { 
@@ -36,16 +36,15 @@ void quicksort0(void **A, int N, int M, int (*compare)()) {
   quicksort0c(A, N, M, depthLimit, compare);
 } // end quicksort0
 
-void dflgm();
-void insertionsort();
 // Quicksort equipped with a defense against quadratic explosion;
 // calling heapsort if depthlimit exhausted
-void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
+void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)(const void*, const void*)) {
   // printf("Enter quicksort0c N: %d M: %d %d\n", N, M, depthLimit);
   // printf(" gap %d \n", M-N);
   while ( N < M ) {
-    int L = 1+ M - N;
-    if ( L < 7 ) {
+    // printf("quicksort0c N: %d M %d  L %i\n", N, M, M-N);
+    int L = 1 + M - N;
+    if ( L < 8 ) {
       insertionsort(A, N, M, compareXY);
       return;
     }
@@ -56,12 +55,11 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
     depthLimit--;
 
     // 7 <= L
-
     int p0 = N + (L>>1); // N + L/2;
     if ( 7 < L ) {
       int pn = N;
       int pm = M;
-      if ( 40 < L ) {
+      if ( 51 < L ) {
 	int d = (L-2)>>3; // L/8;
 	pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
 	p0 = med(A, p0 - d, p0, p0 + d, compareXY);
@@ -69,8 +67,6 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       }
       p0 = med(A, pn, p0, pm, compareXY);
     }
-
-
 
     /* optional check when inputs have many equal elements
     if ( compareXY(A[N], A[M]) == 0 ) {
@@ -87,8 +83,8 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
     // int k;
     // int small = 120; 
 
-    if ( L <= small ) {
-
+    if ( L < small ) { 
+      // This is a B&M variant
       I = N+1; J = M; 
       int N2 = I, M2 = J, l, r, eql, eqr;
     Left2:
@@ -106,6 +102,7 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       goto Left2;
 
   Skip2:
+      // printf("N %i i %i j %i M %i\n",N,I,J,M);
       l = N2-N; r = I-N2;
       eql = ( l < r ? l : r );
       vswap(A, N, I-eql, eql); 
@@ -122,8 +119,9 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       if ( N < M ) { continue; }
       return;
     }
-
-    // 1st round of partitioning
+    // ------------------------------------------------------
+    // 1st round of partitioning for larger segments
+    // Minimizing comparisons is sacrificed for faster loops 
 	// The left segment has elements <= T
 	// The right segment has elements > T
     /*
@@ -141,10 +139,8 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
     AJ = A[J]; // A[J] <= T
 
     // N < J <= M  
-    I = N+1;
-    if (J < M ) {
-      while ( compareXY(A[I], T) <= 0 ) I++;
-    }
+    I = N;
+    if ( J < M ) while ( compareXY(A[++I], T) <= 0 ); 
     else { // J = M
       if ( compareXY(T, A[M]) == 0 ) { // bail out
 	int px =  N + (L>>1); // N + L/2;
@@ -162,19 +158,10 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       }
     }
 
-    if ( I == J ) {
-      I++; 
-      goto Skip;
-    }
-    if ( J < I ) // J+1 = I
-      goto Skip;
-    // I < J   swap
+  if ( I < J ) {
+    // iswap(i, j, A);
     A[J] = A[I]; A[I] = AJ;
-    if ( I+1 == J ) {
-      J--; I++;
-      goto Skip;
-    }
-    // fall through
+  } else goto Skip;
 
   Left: 
     /*
@@ -182,16 +169,43 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
 	  N   <=T    I             J   >T      M   
     */
     while ( compareXY(A[++I],  T) <= 0 ); 
-    if ( J < I ) goto Skip;
+    if ( J <= I ) goto Skip;
     AI = A[I];
     while ( compareXY(T, A[--J]) < 0 ); 
+    if ( J <= I ) goto Skip;
     AJ = A[J];
+    A[I] = AJ; A[J] = AI;
+    goto Left;
+    /*
     if ( I < J ) { // swap
       A[I] = AJ; A[J] = AI;
       goto Left;
     }
+    */
  Skip:
+
+    /*
+  {
+    printf("Skip ----- N %i M %i  L %i\n", N,M, M-N);
+    printf("Skip i %i j %i \n", I, J);
+    int k;
+    for ( k = J-1; k <= I+1; k++)
+      printf("k %i  %i ", k, compareXY(T, A[k]));
+    printf("\n\n");
+  }
+  //  */
+
     // Tail iteration
+    J = I-1;
+    iswap(N, J, A); // put the pivot
+    if ( (I - N) < (M - J) ) { // smallest one first
+      if ( N < J-1 ) quicksort0c(A, N, J-1, depthLimit, compareXY);
+      N = I; 
+    } else {
+      if (I < M ) quicksort0c(A, I, M, depthLimit, compareXY);
+      M = J-1;
+    }
+    /*
     if ( (I - N) < (M - J) ) { // smallest one first
       quicksort0c(A, N, J, depthLimit, compareXY);
       N = I; 
@@ -199,6 +213,7 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       quicksort0c(A, I, M, depthLimit, compareXY);
       M = J;
     }
+    */
   } // end of while loop
 } // end of quicksort0c
 
