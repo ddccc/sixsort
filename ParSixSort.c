@@ -71,7 +71,6 @@ char* expiration = "*** License for sixsort has expired ...\n";
 int sleepingThreads = 0;
 int NUMTHREADS;
 
-
 struct stack *ll;
 struct task *newTask();
 
@@ -84,8 +83,8 @@ void addTaskSynchronized();
 // */
 #include "Qusort.c"
 #include "C2sort.c" 
-// #include "C2fsort.c"
 
+#include "D4.c"
 #include "Qstack.c"
 #include "C4p.c"
 
@@ -259,10 +258,11 @@ void sixsort(void **A, int size,
   // A = AA;
   // compareXY = compar;
 
-  if ( size <= cut2SLimit || numberOfThreads <= 1) {
+  if ( size <= cut2SLimit || numberOfThreads <= 1 ) {
     quicksort0(A, 0, size-1, compareXY);
     return;
   }
+  // printf("sixsort size %d\n", size);
   sleepingThreads = 0;
   NUMTHREADS = numberOfThreads;
   pthread_t thread_id[NUMTHREADS];
@@ -362,6 +362,7 @@ void sixsort(void **A, int size,
       |------------------------][----------------------------|
       N           <           m3           >=                M
      */
+    // printf("pss m3 %i\n", m3);
     t1 = newTask(A, N, m3, depthLimit, compareXY);
     addTaskSynchronized(ll, t1);
     t1 = newTask(A, m3+1, M, depthLimit, compareXY);

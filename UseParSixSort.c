@@ -71,12 +71,19 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include <string.h>
 #include <math.h>
 
+/*
+#include "Hsort.c"
+#include "Dsort.c"
+#include "Isort.c"
+#include "Qusort.c"
+*/
+
 #define errexit(code,str)                          \
   fprintf(stderr,"%s: %s\n",(str),strerror(code)); \
   exit(1);
 
 
-int NUMTHREADS = 2;
+int NUMTHREADS = 4;
 
 // Example of objects that can be used to populate an array to be sorted:
   // To obtain the int field from X: ((struct intval *) X)->val
@@ -102,7 +109,9 @@ int compareIntVal (const void *a, const void *b)
 void callHeapsort(void **A, int size, int (*compar)() );
 void heapc(void **A, int N, int M, int (*compar)());
 void heapSort(void **A, int size, int (*compar)());
-// void cut2f(void **A, int N, int M, int (*compar)());
+void quicksort0(void **A, int N, int M, int (*compar)());
+void quicksort0c(void **A, int N, int M, int depthLimit, int (*compar)());
+// void cut2c(void **A, int N, int M, int depthLimit, int (*compar)());
 void dflgm(void **A, int N, int M, int pivotx, void (*cut)(), int depthLimit, int (*compar)());
 void sixsort(void **AA, int size, 
 	int (*compar ) (const void *, const void * ),
@@ -128,17 +137,17 @@ int main (int argc, char *argv[]) {
   // To check that cut2S produces a sorted array
   // testCut2S();
   // To check that sixsort produces a sorted array
-  testSixsort();
+  // testSixsort();
   // Ditto but using the general function testAlgorithm
      // ... and uncomment also testSixSort2 ...
      // testSixSort2();
   // To check that threesort produces a sorted array
   // testThreesort();
   // Compare the outputs of two sorting algorithms
-     validateXYZ(); // must provide an other algorithm XYZ
+  // validateXYZ(); // must provide an other algorithm XYZ
      // ... and uncomment validateXYZ ...
   // Measure the sorting time of an algorithm
-     // timeTest();
+  timeTest();
   // Compare the speed fraction of two algorithms
      // compareSixsortAgainstXYZ();
      // ... and uncomment also compareSixsortAgainstXYZ ...
@@ -400,7 +409,7 @@ void timeTest() {
   printf("timeTest() of sixsort \n");
   double algTime, T;
   int seed;
-  int seedLimit = 10;
+  int seedLimit = 3;
   int z;
   int siz = 1024 * 1024 * 16;
   // construct array
@@ -414,7 +423,7 @@ void timeTest() {
 
   // warm up the process
   fillarray(A, siz, 666); 
-  int sumTimes = 0;
+  float sumTimes = 0;
   for (z = 0; z < 3; z++) { // repeat to check stability
     algTime = 0;
     // measure the array fill time
@@ -453,7 +462,7 @@ void timeTest() {
     printf("algTime: %f \n", algTime);
     sumTimes = sumTimes + algTime;
   }
-  printf("%s %d %s", "sumTimes: ", sumTimes, "\n");
+  printf("%s %f %s", "average: ", sumTimes/seedLimit, "\n");
 } // end timeTest()
 
 // Report the speed fraction of two algorithms on a range of array sizes
@@ -789,8 +798,8 @@ void quicksort0p(void **A, uint N, int M, int (*compar)() ) {
   quicksort0pc(A, N, M, depthLimit, compar);
 } // end quicksort0p
 
-void heapc();
-void quicksort0c(void **A, int N, int M, int depthLimit, int (*compar)());
+// void heapc();
+// void quicksort0c(void **A, int N, int M, int depthLimit, int (*compar)());
 // quicksort0pc is pretty close to parallel FourSort
 void quicksort0pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
         int L;

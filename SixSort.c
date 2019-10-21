@@ -72,8 +72,8 @@ char* expiration = "*** License for sixsort has expired ...\n";
 #include "Qusort.c"
 #include "C2sort.c" 
 
-
-#include "c4.c"
+#include "D4.c"
+#include "C4.c"
  
 
 void sixsort(void **AA, int size, 

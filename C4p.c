@@ -1,8 +1,8 @@
-// File: c:/bsd/rigel/sort/sixsort/c4p.c
-// Date: Thu Jan 26 16:26:00 2017
+// File: c:/bsd/rigel/sort/C7/C4p.c
+// Date: Sun Oct 20 14:51:33 2019
 // (C) Dennis de Champeaux/ OntoOO
 
-int cut4Limit = 1400; // transition to 1-pivot
+int cut4Limit4 = 500; // transition to 1-pivot
 
 void cut4Pc();
 // cut4P is doing 4-partitioning using 3 pivots
@@ -10,30 +10,28 @@ void cut4P(void **A, int N, int M, int (*compar)()) {
   // printf("cut4P %d %d \n", N, M);
   int L = M - N; 
   // cut4Pc(N, M, 0); return; // for testing heapsort
-  if ( L < cut4Limit ) {
-    // cut2f(A, N, M, compar); 
+  if ( L < cut4Limit4 ) {
     quicksort0(A, N, M, compar); 
     return; 
   }
-  int depthLimit = 1 + 2.5 * floor(log(L));
+  int depthLimit = 2.5 * floor(log(L));
   cut4Pc(A, N, M, depthLimit, compar);
 } // end cut4P
 
 void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) 
 {
-  int L; 
- Start:
+ Start: ;
   // printf("cut4Pc %d %d  %d\n", N, M, depthLimit);
-  L = M - N +1; 
-  if ( L <= 0 ) return;
+  int L = M - N + 1; 
+  if ( L <= 1 ) return;
+  if ( L < cut4Limit4 ) {
+    // quicksort0c(A, N, M, depthLimit, compareXY); 
+    d4c(A, N, M, depthLimit, compareXY); 
+    return; 
+  }
   if ( depthLimit <= 0 ) {
     heapc(A, N, M, compareXY);
     return;
-  }
-  if ( L < cut4Limit ) {
-    // cut2fc(A, N, M, depthLimit, compareXY); 
-    quicksort0c(A, N, M, depthLimit, compareXY); 
-    return; 
   }
   depthLimit--;
 
@@ -45,7 +43,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
   i = N; j = M;
   z = middlex = N + (L>>1); // N + L/2
 
-  const int small = 4000; 
+  const int small = 900; 
   if ( L < small ) { // use 5 elements for sampling
     int e1, e2, e3, e4, e5;
     e1 = maxlx = N; e5 = minrx = M; mrx = middlex+1;
@@ -70,7 +68,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
     iswap(mrx, e4, A);
     lw = z-1; up = mrx+1;
   } else { // small <= L
-    int probeLng = sqrt(L/6);
+    int probeLng = sqrt(L);
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
     N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;

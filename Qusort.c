@@ -2,9 +2,11 @@
 // Date: Fri Jan 31 13:32:12 2014/ Tue May 19 15:02:00 2015, 2017
 // (C) OntoOO/ Dennis de Champeaux
 
-// #include "Hsort.c"
-// #include "Dsort.c"
-// #include "Isort.c"
+/*
+#include "Hsort.c"
+#include "Dsort.c"
+#include "Isort.c"
+*/
 
 void quicksort0c(void **, int, int, int, int (*)(const void*, const void*));
 
@@ -38,7 +40,9 @@ void quicksort0(void **A, int N, int M, int (*compare)(const void*, const void*)
 
 // Quicksort equipped with a defense against quadratic explosion;
 // calling heapsort if depthlimit exhausted
-void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)(const void*, const void*)) {
+
+void quicksort0c(void **A, int N, int M, int depthLimit, 
+		 int (*compareXY)(const void*, const void*)) {
   // printf("Enter quicksort0c N: %d M: %d %d\n", N, M, depthLimit);
   // printf(" gap %d \n", M-N);
   while ( N < M ) {
@@ -132,7 +136,7 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)(const 
     while ( compareXY(T, A[--J]) < 0 );
     if ( N == J ) { // poor pivot  N < x -> T < A[x], suspect bad input
       int px =  N + (L>>1); // N + L/2;
-      iswap(p0, px, A);
+      iswap(N, px, A);
       dflgm(A, N, M, px, quicksort0c, depthLimit, compareXY);
       return;
     }
@@ -144,7 +148,7 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)(const 
     else { // J = M
       if ( compareXY(T, A[M]) == 0 ) { // bail out
 	int px =  N + (L>>1); // N + L/2;
-	iswap(p0, px, A);
+	iswap(N, px, A);
 	dflgm(A, N, M, px, quicksort0c, depthLimit, compareXY);
 	return;
       }
@@ -152,7 +156,7 @@ void quicksort0c(void **A, int N, int M, int depthLimit, int (*compareXY)(const 
       while ( I < J && compareXY(A[I], T) <= 0 ) { I++; }
       if ( M == I ) { // all elements are <= T, suspect bad input
 	int px =  N + (L>>1); // N + L/2;
-	iswap(p0, px, A);
+	iswap(N, px, A);
 	dflgm(A, N, M, px, quicksort0c, depthLimit, compareXY);
 	return;
       }
