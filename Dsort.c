@@ -1,7 +1,12 @@
+// c:/bsd/rigel/sort/Dsort.c
+// Date: Fri Jan 31 13:32:12 2014
+// (C) OntoOO/ Dennis de Champeaux
+
 void dflgm(void **A, int N, int M, int pivotx,
            void (*cut)(void**, int, int, int,
                        int (*)(const void*, const void*)),
            int depthLimit, int (*compareXY)(const void*, const void*)) {
+
   // printf("dflgm N %i M %i pivotx %i depthLimit %i\n", N,M,pivotx,depthLimit);
   /*
     Simple version of partitioning with: L/M/R

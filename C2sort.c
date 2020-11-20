@@ -2,11 +2,7 @@
 // Date: Fri Jan 31 13:32:12 2014, 2017 Sun Mar 03 16:14:28 2019
 // (C) OntoOO/ Dennis de Champeaux
 
-// const int cut2Limit =  1200; // 4.05546e+08 clocktime 9884
-const int cut2Limit =  1150;    // 4.05561e+08 clocktime 9834
-// const int cut2Limit =  1100; // 4.05584e+08 clocktime 9840
-// const int cut2Limit =  1000; // 4.05635e+08 clocktime 9843
-// const int cut2Limit =  950;  // 4.05656e+08 clocktime 9856
+const int cut2Limit =  600; 
 
 
 
@@ -25,6 +21,8 @@ void cut2(void **A, int N, int M, int (*compare)()) {
   cut2c(A, N, M, depthLimit, compare);
 } // end cut2
 
+// static void quicksort1c(void **, int, int, int, int (*)(const void*, const void*));
+
 // Cut2c does 2-partitioning with one pivot.
 // Cut2c invokes dflgm when trouble is encountered.
 void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
@@ -32,27 +30,53 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
  Start:
   L = M - N + 1;
   if ( L <= 1 ) return;
+
+  // /*
+  if ( L < 8 ) { // insertionsort
+    insertionsort(A, N, M, compareXY);
+    return;
+  }
+  //  */
+
   if ( depthLimit <= 0 ) {
     heapc(A, N, M, compareXY);
     return;
   }
+  depthLimit--;
+
+  /*
+  if ( L < cut2Limit ) { 
+    // This alternative over esaping to quicksort0c reduced 1/2% comparisons
+    int middlex = N + (L>>1); // N + L/2;
+    int p0 = middlex;
+    if ( 7 < L ) {
+      int pn = N;
+      int pm = M;
+      if ( 51 < L ) {	
+	int d = (L-2)>>3; // L/8;
+	pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
+	p0 = med(A, p0 - d, p0, p0 + d, compareXY);
+	pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
+      }
+      p0 = med(A, pn, p0, pm, compareXY);
+    }
+    if ( middlex != p0 ) iswap(p0, middlex, A);
+    dflgm(A, N, M, middlex, cut2c, depthLimit, compareXY);
+    return;
+  }
+  // */
+  // /*
   if ( L < cut2Limit ) { 
     quicksort0c(A, N, M, depthLimit, compareXY);
     return;
   }
-  depthLimit--;
+  // */
 
   register void *T; // pivot
   register int I = N, J = M; // indices
   int middlex = N + (L>>1); // N + L/2
   void *middle;
-  // const int small = 4200; // 4.08673e+08 clocktime 30403
-  // const int small = 3700; // 4.08484e+08 clocktime 30193
-  // const int small = 3300; // 4.08397e+08 clocktime 30018
-  const int small = 3200; // 4.08377e+08 clocktime 30003
-  // const int small = 3100; // 4.08361e+08 clocktime 30012
-  // const int small = 3000; // 4.08343e+08 clocktime 30043
-  // const int small = 2800; // 4.08318e+08 clocktime 30147
+  const int small = 3200;
 
   if ( L < small ) { // use 5 elements for sampling
         int sixth = (L + 1) / 6;
@@ -105,6 +129,7 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
     for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
       { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
     // sort this mini array to obtain good pivots
+    /*
     if ( probeLng < 120 ) quicksort0c(A, N1, M1, depthLimit, compareXY); else {
       // protect against constant arrays
       int p0 = N1 + (probeLng>>1);
@@ -113,8 +138,11 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       p0 = med(A, p0 - d, p0, p0 + d, compareXY);
       pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
       p0 = med(A, pn, p0, pm, compareXY);
-      dflgm(A, N1, M1, p0, quicksort0c, depthLimit, compareXY);
+      if ( p0 != middlex ) iswap(p0, middlex, A); 
+      dflgm(A, N1, M1, middlex, quicksort0c, depthLimit, compareXY);
     }
+    */
+    quicksort0c(A, N1, M1, depthLimit, compareXY);
     T = middle = A[middlex];
     if ( compareXY(A[M1], middle) <= 0 ) {
       // give up because cannot find a good pivot

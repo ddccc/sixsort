@@ -83,6 +83,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
     for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
     { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
     // sort this mini array to obtain good pivots
+    /*
     if ( probeLng < 120 ) quicksort0c(A, N1, M1, depthLimit, compareXY); else {
       // protect against constant arrays
       int p0 = N1 + (probeLng>>1);
@@ -93,7 +94,8 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
       p0 = med(A, pn, p0, pm, compareXY);
       dflgm(A, N1, M1, p0, quicksort0c, depthLimit, compareXY);
     }
-
+    */
+    quicksort0c(A, N1, M1, depthLimit, compareXY);
     lw = maxlx; up = minrx;
   }
 

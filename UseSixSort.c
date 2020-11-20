@@ -65,7 +65,7 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <time.h>
 
 // To avoid compiler warnings:::
 void callQuicksort0(void **AA, int size, int (*compar )());
@@ -105,7 +105,7 @@ void validateHeapSort();
 void validateSixSort();
 void validateBentley();
 void validateQsort();
-int clock();
+// int clock();
 void validateSixSortBT();
 void compareBentleyAgainstSixSort(); // on Bentley test bench
 void comparePart3BAgainstSixSort(); // on Bentley test bench
@@ -152,15 +152,15 @@ int main (int argc, char *argv[]) {
      // sixsort(0, 0, 0);
   // To check that a sorted array is produced
      // testQuicksort0();
-     testSixSort(); 
+     // testSixSort(); 
      // testQsort();
      // testBentley();
   // validateHeapSort();
-     validateSixSort();
+  // validateSixSort();
   // validateQsort();
   // validateBentley();
   // Measure the sorting time of an algorithm
-  // timeTest();
+  timeTest();
   // Compare the outputs of two sorting algorithms
      // validateXYZ(); // must provide an other algorithm XYZ
      // ... and uncomment validateXYZ ...
@@ -168,7 +168,7 @@ int main (int argc, char *argv[]) {
      // compareSixsortAgainstXYZ();
      // ... and uncomment also compareSixsortAgainstXYZ ...
   // Whatever here:::
-     // compareQuicksort0AgainstSixSort();
+     compareQuicksort0AgainstSixSort();
      // compareCut2AgainstSixSort(); 
      // compareQsortAgainstQuicksort0(); 
      // compareQsortAgainstCut2(); 
@@ -424,12 +424,14 @@ void validateBentley() {
 // Run an algorithm and report the time used
 void timeTest() {
   printf("timeTest() of sixsort \n");
-  int algTime, T;
+  double algTime; 
+  clock_t T;
   int seed;
   // int seedLimit = 10;
   int seedLimit = 3;
   int z;
-  int siz = 1024 * 1024 * 16;
+  // int siz = 1024 * 1024 * 16;
+  int siz = 1024 * 1024;
   // construct array
   struct intval *pi;
   void **A = myMalloc("timeTest 1", sizeof(pi) * siz);
@@ -441,12 +443,12 @@ void timeTest() {
 
   // warm up the process
   fillarray(A, siz, 666); 
-  int sumTimes = 0;
+  double sumTimes = 0;
   int reps = 3;
   for (z = 0; z < reps; z++) { // repeat to check stability
     algTime = 0;
     // measure the array fill time
-    int TFill = clock();
+    clock_t TFill = clock();
     for (seed = 0; seed < seedLimit; seed++) 
       fillarray(A, siz, seed);
       // here alternative ways to fill the array
@@ -469,10 +471,11 @@ void timeTest() {
     }
     // ... and subtract the fill time to obtain the sort time
     algTime = (clock() - T - TFill)/ seedLimit;
-    printf("algTime: %d \n", algTime);
+    algTime = algTime/ CLOCKS_PER_SEC;
+    printf("algTime: %f \n", algTime);
     sumTimes = sumTimes + algTime;
   }
-  printf("%s %d %s", "sumTimes: ", (sumTimes/reps), "\n");
+  printf("%s %f %s", "sumTimes: ", (sumTimes/reps), "\n");
   // free array
   for (i = 0; i < siz; i++) {
     free(A[i]); 
@@ -494,6 +497,7 @@ void callCut2(void **A, int size,
 void compareAlgorithms00(char *label, int siz, int seedLimit, 
 		   void (*alg1)(), void (*alg2)(),
 		   int (*compare1)(), int (*compare2)() ) {
+  printf("The timings have only comparative relevance.\n");
   printf("%s on size: %d seedLimit: %d\n", label, siz, seedLimit);
   int alg1Time, alg2Time, T;
   int seed;
