@@ -1,5 +1,6 @@
 // c:/bsd/rigel/sort/Qusort.c
 // Date: Fri Jan 31 13:32:12 2014/ Tue May 19 15:02:00 2015, 2017
+// Fri Nov 27 20:13:42 2020
 // (C) OntoOO/ Dennis de Champeaux
 
 /*
@@ -25,9 +26,9 @@ void vswap(void **A, int N, int N3, int eq) {
 }
 
 const int small = 400;
-// Quicksort function for invoking quicksort0c.
+
 void quicksort0(void **A, int N, int M, int (*compare)(const void*, const void*)) {
-  //  printf("quicksort0 N %i M %i L %i\n", N, M, M-N);
+  // printf("quicksort0 N %i M %i L %i\n", N, M, M-N);
   int L = M - N;
   if ( L <= 0 ) return;
   if ( L < 7 ) { 
@@ -48,7 +49,8 @@ void quicksort0c(void **A, int N, int M, int depthLimit,
   while ( N < M ) {
     // printf("quicksort0c N: %d M %d  L %i\n", N, M, M-N);
     int L = 1 + M - N;
-    if ( L < 8 ) {
+    // if ( L < 8 ) {
+    if ( L < 12) {
       insertionsort(A, N, M, compareXY);
       return;
     }
@@ -63,7 +65,8 @@ void quicksort0c(void **A, int N, int M, int depthLimit,
     if ( 7 < L ) {
       int pn = N;
       int pm = M;
-      if ( 51 < L ) {
+      // if ( 51 < L ) {
+      if ( 40 < L ) {
 	int d = (L-2)>>3; // L/8;
 	pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
 	p0 = med(A, p0 - d, p0, p0 + d, compareXY);
@@ -84,8 +87,6 @@ void quicksort0c(void **A, int N, int M, int depthLimit,
     register void *T = A[N]; // pivot
     register int I, J; // indices
     register void *AI, *AJ; // array values
-    // int k;
-    // int small = 120; 
 
     if ( L < small ) { 
       // This is a B&M variant
@@ -110,16 +111,21 @@ void quicksort0c(void **A, int N, int M, int depthLimit,
       l = N2-N; r = I-N2;
       eql = ( l < r ? l : r );
       vswap(A, N, I-eql, eql); 
-      l = J+N-N2;
-      if ( 0 < l-N )  { 
-	// printf("Left recursion N %i l %i\n", N, l);
-	quicksort0c(A, N, l, depthLimit, compareXY);
-      }
+      int M3 = J+N-N2;
       l = M2-J; r = M-M2;
       eqr = ( l < r ? l : r );
       vswap(A, I, M-eqr+1, eqr);
-      // right 'recursion' tail
-      N = I + (M-M2);
+      int N3 = I + (M-M2);
+      int left = M3-N;
+      int right = M-N3;
+      if ( left <= right) {
+	if ( 0 < left ) quicksort0c(A, N, M3, depthLimit, compareXY);
+	N = N3;
+	if ( N < M ) { continue; }
+	return;
+      }
+      if ( 0 < right ) quicksort0c(A, N3, M, depthLimit, compareXY);
+      M = M3;
       if ( N < M ) { continue; }
       return;
     }
@@ -152,7 +158,6 @@ void quicksort0c(void **A, int N, int M, int depthLimit,
 	dflgm(A, N, M, px, quicksort0c, depthLimit, compareXY);
 	return;
       }
-      // define M2?
       while ( I < J && compareXY(A[I], T) <= 0 ) { I++; }
       if ( M == I ) { // all elements are <= T, suspect bad input
 	int px =  N + (L>>1); // N + L/2;

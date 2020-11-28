@@ -27,11 +27,15 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
 {
   int L;
  Start:
+
   // printf("cut4c %d %d \n", N, M);
   L = M - N +1; 
+  if ( L < 1024 * 256 ) {
+    cut2lr(A, N, M, compareXY);
+    return;
+  }
+  /*
   if ( L <= 1 ) return;
-
-
   // alternative prefix
   if ( L < cut4Limit ) {
     // cut2c(A, N, M, depthLimit, compareXY);  // alternative
@@ -39,7 +43,7 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
     d4c(A, N, M, depthLimit, compareXY); 
     return; 
     }
-
+  */
   if ( depthLimit <= 0 ) {
     heapc(A, N, M, compareXY);
     return;
@@ -54,9 +58,9 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
   register void *maxl, *middle, *minr;   
   register int i, j, lw, up, z; // indices
   i = N; j = M;
-  z = middlex = N + (L>>1); // N + L/2
-
+  z = middlex = N + (L>>1); // N + L/2/
   const int small = 900; 
+  /*
   // const int small = 4000; 
   if ( L < small ) { // use 5 elements for sampling
     int e1, e2, e3, e4, e5;
@@ -81,7 +85,9 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
     A[e1] = ae1; A[e2] = ae2; A[e3] = ae3; A[e4] = ae4; A[e5] = ae5;
     iswap(mrx, e4, A);
     lw = z-1; up = mrx+1;
-  } else { // small <= L, use a variable number for sampling
+  } else 
+  */
+{ // small <= L, use a variable number for sampling
     int probeLng = sqrt(L/5.8); 
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;

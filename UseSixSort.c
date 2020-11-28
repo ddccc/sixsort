@@ -39,7 +39,7 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 
 
 // File: c:/bsd/rigel/sort/UseSixSort.c
-// Date: Thu Jan 07 15:38:08 2010
+// Date: Thu Jan 07 15:38:08 2010 Sat Nov 28 13:00:25 2020
 
 /*
    This file is a test bench for excercising sixsort and testing 
@@ -77,15 +77,16 @@ void callLQ();
 void callChensort();
 void callPart3();
 void compareBentleyAgainstSixSort();
+void compareBentleyAgainstQuicksort0(); // +++ testing Q0
 void compareLQAgainstSixSort();
 void compareChenSortAgainstSixSort();
 void compareCut2AgainstSixSort();
+void compareC2LRAgainstSixSort();
 void compareQsortAgainstQuicksort0();
 void compareQsortAgainstCut2();
 void compareQuicksort0AgainstSixSort();
 void comparePart3AgainstSixSort();
 void compareSixSortAgainstXYZ();
-// void iswap();
 void insertionsort();
 void quicksort0(void **A, int N, int M, int (*compar )());
 void cut2(void **A, int N, int M, int (*compar )());
@@ -105,10 +106,17 @@ void validateHeapSort();
 void validateSixSort();
 void validateBentley();
 void validateQsort();
-// int clock();
 void validateSixSortBT();
 void compareBentleyAgainstSixSort(); // on Bentley test bench
 void comparePart3BAgainstSixSort(); // on Bentley test bench
+
+/*
+void heapc();
+void quicksort0c();
+void dflgm();
+#include "C2LR.c"
+*/
+void cut2lr();
 
 // Here global entities used throughout
 // int (*compareXY)();
@@ -160,7 +168,7 @@ int main (int argc, char *argv[]) {
   // validateQsort();
   // validateBentley();
   // Measure the sorting time of an algorithm
-  timeTest();
+  // timeTest();
   // Compare the outputs of two sorting algorithms
      // validateXYZ(); // must provide an other algorithm XYZ
      // ... and uncomment validateXYZ ...
@@ -168,12 +176,14 @@ int main (int argc, char *argv[]) {
      // compareSixsortAgainstXYZ();
      // ... and uncomment also compareSixsortAgainstXYZ ...
   // Whatever here:::
-     compareQuicksort0AgainstSixSort();
-     // compareCut2AgainstSixSort(); 
+     // compareBentleyAgainstSixSort(); +++
+     compareBentleyAgainstQuicksort0(); // +++ TESTING
+     // compareQuicksort0AgainstSixSort();
+     // compareCut2AgainstSixSort(); +++
+     // compareC2LRAgainstSixSort(); +++
      // compareQsortAgainstQuicksort0(); 
      // compareQsortAgainstCut2(); 
-     // compareBentleyAgainstSixSort();
-     // compareLQAgainstSixSort();
+      // compareLQAgainstSixSort();
      // compareChenSortAgainstSixSort();
      // comparePart3AgainstSixSort();
      // validateSixSortBT();
@@ -497,14 +507,15 @@ void callCut2(void **A, int size,
 void compareAlgorithms00(char *label, int siz, int seedLimit, 
 		   void (*alg1)(), void (*alg2)(),
 		   int (*compare1)(), int (*compare2)() ) {
+  seedLimit = seedLimit * 3; // more reps
   printf("The timings have only comparative relevance.\n");
   printf("%s on size: %d seedLimit: %d\n", label, siz, seedLimit);
-  int alg1Time, alg2Time, T;
+  double alg1Time, alg2Time; 
+  clock_t T;
   int seed;
   int z;
   int limit = 1024 * 1024 * 16 + 1;
   while (siz <= limit) {
-    if ( seedLimit < 30 ) seedLimit = 30;
     printf("siz: %d seedLimit: %d\n", siz, seedLimit);
     struct intval *pi;
     void **A = myMalloc("compareAlgorithms0 1", sizeof(pi) * siz);
@@ -520,8 +531,8 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
       fillarray(A, siz, seed);
     // for (z = 0; z < 6; z++) { // repeat to check stability
     int repeats = 1; 
-    int totalAlg1 = 0; int totalAlg2 = 0;
-    int TFill;
+    double totalAlg1 = 0; double totalAlg2 = 0;
+    clock_t TFill;
     for (z = 0; z < repeats; z++) { // repeat to check stability
       alg1Time = 0; 
       TFill = clock();
@@ -536,11 +547,12 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
 	(*alg1)(A, siz, compare1); 
       }
       alg1Time = clock() - T - TFill;
+      printf("alg1Time %f\n", alg1Time);
       totalAlg1 += alg1Time;
     }
     for (z = 0; z < repeats; z++) { // repeat to check stability
       alg2Time = 0;
-      int TFill = clock();
+      TFill = clock();
       // for (seed = 0; seed < seedLimit; seed++)
       for (seed = siz; seed < siz+seedLimit; seed++)  
 	fillarray(A, siz, seed);
@@ -552,13 +564,14 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
 	(*alg2)(A, siz, compare2);
       }
       alg2Time = clock() - T - TFill;
+      printf("alg2Time %f\n", alg2Time);
       totalAlg2 += alg2Time;
     }
     totalAlg1 = totalAlg1/repeats;
     totalAlg2 = totalAlg2/repeats;
     printf("siz: %d ", siz);
-    printf("totalAlg1: %d ", totalAlg1);
-    printf("totalAlg2: %d ", totalAlg2);
+    printf("totalAlg1: %f ", totalAlg1);
+    printf("totalAlg2: %f ", totalAlg2);
     float frac = 0;
     if ( totalAlg1 != 0 ) frac = totalAlg2 / ( 1.0 *  totalAlg1 );
     printf("frac: %f\n", frac);
@@ -610,6 +623,15 @@ void compareCut2AgainstSixSort() {
   compareAlgorithms("Compare cut2 vs sixsort", callCut2, sixsort);
 } // end compareCut2AgainstSixsort 
 
+void compareC2LRAgainstSixSort() {
+  void sixsort(), callC2LR();
+  compareAlgorithms("Compare c2lr2 vs sixsort", callC2LR, sixsort);
+} // end compareC2LRAgainstSixSort()
+
+void callC2LR(void **A, int size, 
+	int (*compar ) (const void *, const void * ) ) {
+  cut2lr(A, 0, size-1, compar);
+} // end  callC2LR
 
 void callQuicksort0(void **A, int size, 
 	int (*compar ) (const void *, const void * ) ) {
@@ -641,12 +663,19 @@ void callQsort(void **A, int size,
 	(int(*)(const void *, const void *)) compar);
 } // end callQsort
 
-void compareBentleyAgainstSixSort(){
+void compareBentleyAgainstSixSort( ){
    void callBentley(), sixsort();
    compareAlgorithms2("Compare bentley vs SixSort", 1024, 32 * 1024,
    // compareAlgorithms2("Compare bentley vs SixSort", 1024 * 1024, 32,
 		      callBentley, sixsort);
 } // end compareBentleyAgainstSixSort
+
+void compareBentleyAgainstQuicksort0() { // testing Q0
+   void callBentley(), callQuicksort0();
+   compareAlgorithms2("Compare bentley vs quicksort0", 1024, 32 * 1024,
+   // compareAlgorithms2("Compare bentley vs SixSort", 1024 * 1024, 32,
+		      callBentley, callQuicksort0);
+} // end compareBentleyAgainstQuicksort0
 
 void compareLQAgainstSixSort(){
    void callLQ(), sixsort();
