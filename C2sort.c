@@ -1,10 +1,11 @@
 // c:/bsd/rigel/sort/C2sort.c
-// Date: Fri Jan 31 13:32:12 2014, 2017 Sun Mar 03 16:14:28 2019
+// Date: Fri Jan 31 13:32:12 2014, 2017 Sun Mar 03 16:14:28 2019 
+// Mon Jan 04 10:43:49 2021
 // (C) OntoOO/ Dennis de Champeaux
 
+// Mon Jan 04 11:11:11 2021 quicksort0 has been removed
+
 const int cut2Limit =  600; 
-
-
 
 void cut2c();
 // cut2 is used as a best in class quicksort implementation 
@@ -13,15 +14,28 @@ void cut2c();
 void cut2(void **A, int N, int M, int (*compare)()) { 
   // printf("cut2 %d %d %d\n", N, M, M-N);
   int L = M - N;
+  int depthLimit = 1 + 2.5 * floor(log(L));
   if ( L < cut2Limit ) { 
-    quicksort0(A, N, M, compare);
+    // quicksort0(A, N, M, compare);
+    int middlex = N + (L>>1); // N + L/2;
+    int p0 = middlex;
+    if ( 7 < L ) {
+      int pn = N;
+      int pm = M;
+      if ( 51 < L ) {	
+	int d = (L-2)>>3; // L/8;
+	pn = med(A, pn, pn + d, pn + 2 * d, compare);
+	p0 = med(A, p0 - d, p0, p0 + d, compare);
+	pm = med(A, pm - 2 * d, pm - d, pm, compare);
+      }
+      p0 = med(A, pn, p0, pm, compare);
+    }
+    if ( middlex != p0 ) iswap(p0, middlex, A);
+    dflgm(A, N, M, middlex, cut2c, depthLimit, compare);
     return;
   }
-  int depthLimit = 1 + 2.5 * floor(log(L));
   cut2c(A, N, M, depthLimit, compare);
 } // end cut2
-
-// static void quicksort1c(void **, int, int, int, int (*)(const void*, const void*));
 
 // Cut2c does 2-partitioning with one pivot.
 // Cut2c invokes dflgm when trouble is encountered.
@@ -32,7 +46,7 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
   if ( L <= 1 ) return;
 
   // /*
-  if ( L < 8 ) { // insertionsort
+  if ( L < 12 ) { // insertionsort
     insertionsort(A, N, M, compareXY);
     return;
   }
@@ -44,9 +58,8 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
   }
   depthLimit--;
 
-  /*
+  // /*
   if ( L < cut2Limit ) { 
-    // This alternative over esaping to quicksort0c reduced 1/2% comparisons
     int middlex = N + (L>>1); // N + L/2;
     int p0 = middlex;
     if ( 7 < L ) {
@@ -65,7 +78,8 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
     return;
   }
   // */
-  // /*
+  /*
+    // Mon Jan 04 11:04:50 2021 Give up on this version
   if ( L < cut2Limit ) { 
     quicksort0c(A, N, M, depthLimit, compareXY);
     return;
@@ -142,7 +156,9 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
       dflgm(A, N1, M1, middlex, quicksort0c, depthLimit, compareXY);
     }
     */
-    quicksort0c(A, N1, M1, depthLimit, compareXY);
+    // quicksort0c(A, N1, M1, depthLimit, compareXY);
+    cut2c(A, N1, M1, depthLimit, compareXY);
+
     T = middle = A[middlex];
     if ( compareXY(A[M1], middle) <= 0 ) {
       // give up because cannot find a good pivot

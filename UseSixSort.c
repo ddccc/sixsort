@@ -456,7 +456,6 @@ void timeTest() {
   double sumTimes = 0;
   int reps = 3;
   for (z = 0; z < reps; z++) { // repeat to check stability
-    algTime = 0;
     // measure the array fill time
     clock_t TFill = clock();
     for (seed = 0; seed < seedLimit; seed++) 
@@ -534,7 +533,6 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
     double totalAlg1 = 0; double totalAlg2 = 0;
     clock_t TFill;
     for (z = 0; z < repeats; z++) { // repeat to check stability
-      alg1Time = 0; 
       TFill = clock();
       // for (seed = 0; seed < seedLimit; seed++) 
       for (seed = siz; seed < siz+seedLimit; seed++) 
@@ -551,7 +549,6 @@ void compareAlgorithms00(char *label, int siz, int seedLimit,
       totalAlg1 += alg1Time;
     }
     for (z = 0; z < repeats; z++) { // repeat to check stability
-      alg2Time = 0;
       TFill = clock();
       // for (seed = 0; seed < seedLimit; seed++)
       for (seed = siz; seed < siz+seedLimit; seed++)  

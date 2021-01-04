@@ -6,16 +6,31 @@ int cut4Limit4 = 500; // transition to 1-pivot
 
 void cut4Pc();
 // cut4P is doing 4-partitioning using 3 pivots
-void cut4P(void **A, int N, int M, int (*compar)()) {
+void cut4P(void **A, int N, int M, int (*compare)()) {
   // printf("cut4P %d %d \n", N, M);
   int L = M - N; 
   // cut4Pc(N, M, 0); return; // for testing heapsort
+  int depthLimit = 2.5 * floor(log(L));
   if ( L < cut4Limit4 ) {
-    quicksort0(A, N, M, compar); 
+    // quicksort0(A, N, M, compare); 
+    int middlex = N + (L>>1); // N + L/2;
+    int p0 = middlex;
+    if ( 7 < L ) {
+      int pn = N;
+      int pm = M;
+      if ( 51 < L ) {	
+	int d = (L-2)>>3; // L/8;
+	pn = med(A, pn, pn + d, pn + 2 * d, compare);
+	p0 = med(A, p0 - d, p0, p0 + d, compare);
+	pm = med(A, pm - 2 * d, pm - d, pm, compare);
+      }
+      p0 = med(A, pn, p0, pm, compare);
+    }
+    if ( middlex != p0 ) iswap(p0, middlex, A);
+    dflgm(A, N, M, middlex, cut2c, depthLimit, compare);
     return; 
   }
-  int depthLimit = 2.5 * floor(log(L));
-  cut4Pc(A, N, M, depthLimit, compar);
+  cut4Pc(A, N, M, depthLimit, compare);
 } // end cut4P
 
 void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) 
@@ -95,7 +110,8 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
       dflgm(A, N1, M1, p0, quicksort0c, depthLimit, compareXY);
     }
     */
-    quicksort0c(A, N1, M1, depthLimit, compareXY);
+    // quicksort0c(A, N1, M1, depthLimit, compareXY);
+    cut2c(A, N1, M1, depthLimit, compareXY);
     lw = maxlx; up = minrx;
   }
 

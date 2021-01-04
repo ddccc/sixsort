@@ -13,11 +13,26 @@ void cut2lrc();
 void cut2lr(void **A, int N, int M, int (*compare)()) { 
   // printf("cut2left %d %d %d\n", N, M, M-N);
   int L = M - N;
+  int depthLimit = 1 + 2.5 * floor(log(L));
   if ( L < cut2LRLimit ) { 
-    quicksort0(A, N, M, compare);
+    // quicksort0(A, N, M, compare);
+    int middlex = N + (L>>1); // N + L/2;
+    int p0 = middlex;
+    if ( 7 < L ) {
+      int pn = N;
+      int pm = M;
+      if ( 51 < L ) {	
+	int d = (L-2)>>3; // L/8;
+	pn = med(A, pn, pn + d, pn + 2 * d, compare);
+	p0 = med(A, p0 - d, p0, p0 + d, compare);
+	pm = med(A, pm - 2 * d, pm - d, pm, compare);
+      }
+      p0 = med(A, pn, p0, pm, compare);
+    }
+    if ( middlex != p0 ) iswap(p0, middlex, A);
+    dflgm(A, N, M, middlex, cut2c, depthLimit, compare);
     return;
   }
-  int depthLimit = 1 + 2.5 * floor(log(L));
   cut2lrc(A, N, M, depthLimit, compare);
 } // end cut2
 
@@ -35,7 +50,7 @@ void cut2lrc(void **A, int N, int M,
   L = M - N + 1;
   if ( L <= 1 ) return;
 
-  if ( L < 9 ) { // insertionsort
+  if ( L < 12 ) { // insertionsort
     insertionsort(A, N, M, compareXY);
     return;
   }
@@ -46,7 +61,7 @@ void cut2lrc(void **A, int N, int M,
   }
   depthLimit--;
 
-  /*
+  // /*
   if ( L < cut2LRLimit ) { 
     // This alternative over escaping to quicksort0c reduced 1/2% comparions
     int middlex = N + (L>>1); // N + L/2;
@@ -67,7 +82,7 @@ void cut2lrc(void **A, int N, int M,
     return;
   }
   // */
-  // /*
+  /*
   if ( L < cut2LRLimit ) { 
     quicksort0c(A, N, M, depthLimit, compareXY);
     return;
@@ -144,7 +159,8 @@ void cut2lrc(void **A, int N, int M,
       dflgm(A, N1, M1, middlex, quicksort0c, depthLimit, compareXY);
     }
     */
-    quicksort0c(A, N1, M1, depthLimit, compareXY);
+    // quicksort0c(A, N1, M1, depthLimit, compareXY);
+    cut2lrc(A, N1, M1, depthLimit, compareXY);
     T = middle = A[middlex];
     if ( compareXY(A[M1], middle) <= 0 ) {
       // give up because cannot find a good pivot

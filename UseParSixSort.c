@@ -83,7 +83,7 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
   exit(1);
 
 
-int NUMTHREADS = 4;
+int NUMTHREADS = 2;
 
 // Example of objects that can be used to populate an array to be sorted:
   // To obtain the int field from X: ((struct intval *) X)->val
@@ -100,9 +100,7 @@ int NUMTHREADS = 4;
 //          the compareIntVal comparison function
 int compareIntVal (const void *a, const void *b)
 {
-  struct intval *pa = (struct intval *) a;
-  struct intval *pb = (struct intval *) b;
-  return (pa->val - pb->val);
+  return ((struct intval *)a)->val - ((struct intval *)b)->val;
 }
 
 // To avoid compiler warnings::
@@ -171,6 +169,7 @@ void *myMalloc(char* location, int size) {
 
 // fillarray assigns random values to the int-field of our objects
 void fillarray(void **A, int lng, int startv) {
+  // printf("fillarray startv %i\n", startv);
   const int range = 1024*1024*32;
   int i;
   srand(startv);
@@ -373,7 +372,7 @@ void validateAlgorithm0(char* label, int siz, void (*alg1)(), void (*alg2)() ) {
     if ( compareIntVal(A[i], B[i]) != 0 ) {
       printf("validate error i: %d\n", i);
       foundError = 1;
-    }
+    } 
   if ( !foundError ) 
     printf("NO error found ...\n");
 } // end validateAlgorithm0
@@ -406,12 +405,14 @@ void validateXYZ() {
 
 // Run an algorithm and report the time used
 void timeTest() {
-  printf("timeTest() of sixsort \n");
   double algTime, T;
   int seed;
   int seedLimit = 3;
   int z;
-  int siz = 1024 * 1024 * 16;
+  // int siz = 1024 * 1024 * 16;
+  int siz = 1024 * 1024 * 4;
+  // int siz = 1024 * 5;
+  printf("timeTest() of sixsort on size %i\n", siz);
   // construct array
   struct intval *pi;
   void **A = myMalloc("timeTest 1", sizeof(pi) * siz);
@@ -425,13 +426,12 @@ void timeTest() {
   fillarray(A, siz, 666); 
   float sumTimes = 0;
   for (z = 0; z < 3; z++) { // repeat to check stability
-    algTime = 0;
     // measure the array fill time
     // int TFill = clock();
     
-      struct timeval tim;
-      gettimeofday(&tim, NULL);
-      double TFILL=tim.tv_sec+(tim.tv_usec/1000000.0);
+    struct timeval tim;
+    gettimeofday(&tim, NULL);
+    double TFILL=tim.tv_sec+(tim.tv_usec/1000000.0);
     
     for (seed = 0; seed < seedLimit; seed++) 
       fillarray(A, siz, seed);
@@ -487,7 +487,6 @@ void compareAlgorithms0(char *label, int siz, int seedLimit, void (*alg1)(), voi
     for (seed = 0; seed < seedLimit; seed++) 
       fillarray(A, siz, seed);
     for (z = 0; z < 5; z++) { // repeat to check stability
-      alg1Time = 0; alg2Time = 0;
       // int TFill = clock();
 	struct timeval tim;
 	gettimeofday(&tim, NULL);

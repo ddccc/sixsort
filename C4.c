@@ -11,8 +11,8 @@ void cut4(void **A, int N, int M, int (*compareXY)()) {
   // printf("cut4 %d %d \n", N, M);
   int L = M - N; 
   if ( L < cut4Limit ) {
-    // cut2(A, N, M, compareXY); 
-    quicksort0(A, N, M, compareXY);
+    cut2(A, N, M, compareXY); 
+    // quicksort0(A, N, M, compareXY);
     // heapc(A, N, M, compareXY); 
     return; 
   }
