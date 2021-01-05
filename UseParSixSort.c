@@ -78,6 +78,12 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include "Qusort.c"
 */
 
+#define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
+void heapc();
+void insertionsort();
+void dflgm();
+#include "Qusort.c"
+
 #define errexit(code,str)                          \
   fprintf(stderr,"%s: %s\n",(str),strerror(code)); \
   exit(1);

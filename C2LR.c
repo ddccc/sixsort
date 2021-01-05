@@ -15,22 +15,7 @@ void cut2lr(void **A, int N, int M, int (*compare)()) {
   int L = M - N;
   int depthLimit = 1 + 2.5 * floor(log(L));
   if ( L < cut2LRLimit ) { 
-    // quicksort0(A, N, M, compare);
-    int middlex = N + (L>>1); // N + L/2;
-    int p0 = middlex;
-    if ( 7 < L ) {
-      int pn = N;
-      int pm = M;
-      if ( 51 < L ) {	
-	int d = (L-2)>>3; // L/8;
-	pn = med(A, pn, pn + d, pn + 2 * d, compare);
-	p0 = med(A, p0 - d, p0, p0 + d, compare);
-	pm = med(A, pm - 2 * d, pm - d, pm, compare);
-      }
-      p0 = med(A, pn, p0, pm, compare);
-    }
-    if ( middlex != p0 ) iswap(p0, middlex, A);
-    dflgm(A, N, M, middlex, cut2c, depthLimit, compare);
+    dflgm3(A, N, M, depthLimit, compare);
     return;
   }
   cut2lrc(A, N, M, depthLimit, compare);
@@ -63,22 +48,7 @@ void cut2lrc(void **A, int N, int M,
 
   // /*
   if ( L < cut2LRLimit ) { 
-    // This alternative over escaping to quicksort0c reduced 1/2% comparions
-    int middlex = N + (L>>1); // N + L/2;
-    int p0 = middlex;
-    if ( 7 < L ) {
-      int pn = N;
-      int pm = M;
-      if ( 51 < L ) {	
-	int d = (L-2)>>3; // L/8;
-	pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
-	p0 = med(A, p0 - d, p0, p0 + d, compareXY);
-	pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
-      }
-      p0 = med(A, pn, p0, pm, compareXY);
-    }
-    if ( middlex != p0 ) iswap(p0, middlex, A);
-    dflgm(A, N, M, middlex, cut2lrc, depthLimit, compareXY);
+    dflgm3(A, N, M, depthLimit, compareXY);
     return;
   }
   // */

@@ -81,10 +81,12 @@ void addTaskSynchronized();
 #include "Dsort.c"
 #include "Isort.c"
 // */
-#include "Qusort.c"
+// #include "Qusort.c"
+
+#include "D3sort.c" 
 #include "C2sort.c" 
 
-#include "D4.c"
+// #include "D4.c"
 #include "Qstack.c"
 #include "C4p.c"
 
@@ -259,7 +261,7 @@ void sixsort(void **A, int size,
   // compareXY = compar;
 
   if ( size <= cut2SLimit || numberOfThreads <= 1 ) {
-    quicksort0(A, 0, size-1, compareXY);
+    cut2(A, 0, size-1, compareXY);
     return;
   }
   // printf("sixsort size %d\n", size);

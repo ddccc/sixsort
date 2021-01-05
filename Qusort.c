@@ -12,7 +12,7 @@
 void quicksort0c(void **, int, int, int, int (*)(const void*, const void*));
 
 // calculate the median of 3
-int med(void **A, int a, int b, int c,
+int medq0(void **A, int a, int b, int c,
 	int (*compareXY ) (const void *, const void * ) ) {
   return
     compareXY( A[a], A[b] ) < 0 ?
@@ -68,11 +68,11 @@ void quicksort0c(void **A, int N, int M, int depthLimit,
       // if ( 51 < L ) {
       if ( 40 < L ) {
 	int d = (L-2)>>3; // L/8;
-	pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
-	p0 = med(A, p0 - d, p0, p0 + d, compareXY);
-	pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
+	pn = medq0(A, pn, pn + d, pn + 2 * d, compareXY);
+	p0 = medq0(A, p0 - d, p0, p0 + d, compareXY);
+	pm = medq0(A, pm - 2 * d, pm - d, pm, compareXY);
       }
-      p0 = med(A, pn, p0, pm, compareXY);
+      p0 = medq0(A, pn, p0, pm, compareXY);
     }
 
     /* optional check when inputs have many equal elements

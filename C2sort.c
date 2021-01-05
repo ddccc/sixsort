@@ -16,24 +16,15 @@ void cut2(void **A, int N, int M, int (*compare)()) {
   int L = M - N;
   int depthLimit = 1 + 2.5 * floor(log(L));
   if ( L < cut2Limit ) { 
-    // quicksort0(A, N, M, compare);
-    int middlex = N + (L>>1); // N + L/2;
-    int p0 = middlex;
-    if ( 7 < L ) {
-      int pn = N;
-      int pm = M;
-      if ( 51 < L ) {	
-	int d = (L-2)>>3; // L/8;
-	pn = med(A, pn, pn + d, pn + 2 * d, compare);
-	p0 = med(A, p0 - d, p0, p0 + d, compare);
-	pm = med(A, pm - 2 * d, pm - d, pm, compare);
-      }
-      p0 = med(A, pn, p0, pm, compare);
-    }
-    if ( middlex != p0 ) iswap(p0, middlex, A);
-    dflgm(A, N, M, middlex, cut2c, depthLimit, compare);
+    dflgm3(A, N, M, depthLimit, compare);
     return;
   }
+  /*
+  if ( L < cut2Limit ) { 
+    quicksort0c(A, N, M, depthLimit, compare);
+    return;
+  }
+  */
   cut2c(A, N, M, depthLimit, compare);
 } // end cut2
 
@@ -57,24 +48,9 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
     return;
   }
   depthLimit--;
-
   // /*
   if ( L < cut2Limit ) { 
-    int middlex = N + (L>>1); // N + L/2;
-    int p0 = middlex;
-    if ( 7 < L ) {
-      int pn = N;
-      int pm = M;
-      if ( 51 < L ) {	
-	int d = (L-2)>>3; // L/8;
-	pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
-	p0 = med(A, p0 - d, p0, p0 + d, compareXY);
-	pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
-      }
-      p0 = med(A, pn, p0, pm, compareXY);
-    }
-    if ( middlex != p0 ) iswap(p0, middlex, A);
-    dflgm(A, N, M, middlex, cut2c, depthLimit, compareXY);
+    dflgm3(A, N, M, depthLimit, compareXY);
     return;
   }
   // */

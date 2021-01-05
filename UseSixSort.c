@@ -67,6 +67,12 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include <math.h>
 #include <time.h>
 
+#define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
+void heapc();
+void insertionsort();
+void dflgm();
+#include "Qusort.c"
+
 // To avoid compiler warnings:::
 void callQuicksort0(void **AA, int size, int (*compar )());
 void callCut2(void **AA, int size, int (*compar )());
