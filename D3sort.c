@@ -30,6 +30,7 @@ void dflgm3(void **A, int N, int M,
     heapc(A, N, M, compareXY);
     return;
   }
+  depthLimit--;
 
     int pivotx = N + (L>>1); // N + L/2;
     int p0 = pivotx;
