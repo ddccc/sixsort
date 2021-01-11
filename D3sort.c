@@ -22,7 +22,8 @@ void dflgm3(void **A, int N, int M,
   L = M - N +1;
   if ( L <= 1 ) return;
 
-  if ( L < 12 ) { // insertionsort
+  // if ( L < 12 ) { // insertionsort
+  if ( L < 9 ) { // insertionsort
     insertionsort(A, N, M, compareXY);
     return;
   }

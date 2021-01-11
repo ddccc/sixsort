@@ -36,7 +36,7 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
   L = M - N + 1;
   if ( L <= 1 ) return;
 
-  // /*
+  /*
   if ( L < 12 ) { // insertionsort
     insertionsort(A, N, M, compareXY);
     return;

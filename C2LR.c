@@ -35,10 +35,12 @@ void cut2lrc(void **A, int N, int M,
   L = M - N + 1;
   if ( L <= 1 ) return;
 
+  /*
   if ( L < 12 ) { // insertionsort
     insertionsort(A, N, M, compareXY);
     return;
   }
+  */
 
   if ( depthLimit <= 0 ) {
     heapc(A, N, M, compareXY);
