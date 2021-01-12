@@ -11,7 +11,15 @@ int med(void **A, int a, int b, int c,
     : compareXY( A[b], A[c] ) > 0 ? b : compareXY( A[a], A[c] ) > 0 ? c : a;
 } // end med
 
-
+void dflgm3();
+// dflgm0 is used as the driver of a sorter using dflgm3
+void dflgm0(void **A, int N, int M, int (*compareXY)(const void*, const void*)) {
+    // printf("dflgm0 %d %d %d\n", N, M, M-N);
+  int L = M - N;
+  int depthLimit = 1 + 2.5 * floor(log(L));
+  dflgm3(A, N, M, depthLimit, compareXY);
+}
+// extern int icnt; // invocation cnt
 void dflgm3(void **A, int N, int M, 
            int depthLimit, int (*compareXY)(const void*, const void*)) {
     // Simple version of partitioning with: L/M/R
@@ -32,7 +40,7 @@ void dflgm3(void **A, int N, int M,
     return;
   }
   depthLimit--;
-
+  // icnt++; // invocation cnt
     int pivotx = N + (L>>1); // N + L/2;
     int p0 = pivotx;
     if ( 7 < L ) {
