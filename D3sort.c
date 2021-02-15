@@ -16,7 +16,7 @@ void dflgm3();
 void dflgm0(void **A, int N, int M, int (*compareXY)(const void*, const void*)) {
     // printf("dflgm0 %d %d %d\n", N, M, M-N);
   int L = M - N;
-  int depthLimit = 1 + 2.5 * floor(log(L));
+  int depthLimit = 1 + 2.9 * floor(log(L));
   dflgm3(A, N, M, depthLimit, compareXY);
 }
 // extern int icnt; // invocation cnt

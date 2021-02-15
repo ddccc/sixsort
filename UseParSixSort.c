@@ -666,7 +666,7 @@ void threesort(void **A, int size,
   // compareXY = compar;
   pthread_t thread_id[NUMTHREADS];
   llx = newStack();
-  int depthLimit = 2.5 * floor(log(size));
+  int depthLimit = 2.9 * floor(log(size));
 
   //   struct task *t = newTask(0, size-1, depthLimit);
   //  addTaskSynchronized0(llx, t);
@@ -799,7 +799,7 @@ void quicksort0p(void **A, uint N, int M, int (*compar)() ) {
     quicksort0(A, N, M, compar);
     return;
   }
-  int depthLimit = 2.5 * floor(log(L));
+  int depthLimit = 2.9 * floor(log(L));
   quicksort0pc(A, N, M, depthLimit, compar);
 } // end quicksort0p
 

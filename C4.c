@@ -17,7 +17,7 @@ void cut4(void **A, int N, int M, int (*compareXY)()) {
     return; 
   }
   // cut4c(N, M, 0); return; // for testing heapsort
-  int depthLimit = 1 + 2.5 * floor(log(L));
+  int depthLimit = 1 + 2.9 * floor(log(L));
   cut4c(A, N, M, depthLimit, compareXY);
 } // end cut4
 

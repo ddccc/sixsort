@@ -269,7 +269,7 @@ void sixsort(void **A, int size,
   NUMTHREADS = numberOfThreads;
   pthread_t thread_id[NUMTHREADS];
   ll = newStack();
-  int depthLimit = 2.5 * floor(log(size));
+  int depthLimit = 2.9 * floor(log(size));
   // Try doing the first partition in parallel with two threads
   int N = 0; int M = size-1; 
   int L = M-N;

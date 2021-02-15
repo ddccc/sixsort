@@ -14,7 +14,7 @@ void cut2c();
 void cut2(void **A, int N, int M, int (*compare)()) { 
   // printf("cut2 %d %d %d\n", N, M, M-N);
   int L = M - N;
-  int depthLimit = 1 + 2.5 * floor(log(L));
+  int depthLimit = 1 + 2.9 * floor(log(L));
   if ( L < cut2Limit ) { 
     dflgm3(A, N, M, depthLimit, compare);
     return;

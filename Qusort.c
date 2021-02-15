@@ -35,7 +35,7 @@ void quicksort0(void **A, int N, int M, int (*compare)(const void*, const void*)
     insertionsort(A, N, M, compare);
     return;
   }
-  int depthLimit = 2.5 * floor(log(L));
+  int depthLimit = 2.9 * floor(log(L));
   quicksort0c(A, N, M, depthLimit, compare);
 } // end quicksort0
 

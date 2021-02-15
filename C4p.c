@@ -10,7 +10,7 @@ void cut4P(void **A, int N, int M, int (*compare)()) {
   // printf("cut4P %d %d \n", N, M);
   int L = M - N; 
   // cut4Pc(N, M, 0); return; // for testing heapsort
-  int depthLimit = 2.5 * floor(log(L));
+  int depthLimit = 2.9 * floor(log(L));
   if ( L < cut4Limit4 ) {
     // quicksort0(A, N, M, compare); 
     cut2c(A, N, M, depthLimit, compare);
