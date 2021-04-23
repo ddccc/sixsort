@@ -83,7 +83,7 @@ void addTaskSynchronized();
 // */
 // #include "Qusort.c"
 
-#include "D3sort.c" 
+// #include "D3sort.c" 
 #include "C2sort.c" 
 
 // #include "D4.c"

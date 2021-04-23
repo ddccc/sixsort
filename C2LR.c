@@ -7,7 +7,7 @@ const int cut2LRLimit =  600;
 const int bufSize = 200;
 
 #define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
-
+void quicksort0();
 void cut2lrc();
 // cut2left is a support function to call up the workhorse cut2leftc
 void cut2lr(void **A, int N, int M, int (*compare)()) { 
@@ -15,7 +15,8 @@ void cut2lr(void **A, int N, int M, int (*compare)()) {
   int L = M - N;
   int depthLimit = 1 + 2.9 * floor(log(L));
   if ( L < cut2LRLimit ) { 
-    dflgm3(A, N, M, depthLimit, compare);
+    // dflgm3(A, N, M, depthLimit, compare);
+    quicksort0c(A, N, M, depthLimit, compare);
     return;
   }
   cut2lrc(A, N, M, depthLimit, compare);
@@ -34,32 +35,23 @@ void cut2lrc(void **A, int N, int M,
 
   L = M - N + 1;
   if ( L <= 1 ) return;
-
   /*
   if ( L < 12 ) { // insertionsort
     insertionsort(A, N, M, compareXY);
     return;
   }
   */
-
   if ( depthLimit <= 0 ) {
     heapc(A, N, M, compareXY);
     return;
   }
   depthLimit--;
 
-  // /*
   if ( L < cut2LRLimit ) { 
-    dflgm3(A, N, M, depthLimit, compareXY);
-    return;
-  }
-  // */
-  /*
-  if ( L < cut2LRLimit ) { 
+    // dflgm3(A, N, M, depthLimit, compareXY);
     quicksort0c(A, N, M, depthLimit, compareXY);
     return;
   }
-  // */
 
   register void *T; // pivot
   register int I = N, J = M; // indices
