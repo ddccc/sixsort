@@ -18,7 +18,6 @@ void insertionsort(void **A, int N, int M, int (*compareXY)()) {
 
 
 // The version below was done by Doug Lea.
-// It is not competitive for the range [2-7] in our applications
 /*
  * Insertion sorting where two adjacent elements are inserted per
  * iteration: first the larger then smaller, but starting from the

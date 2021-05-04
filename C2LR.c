@@ -16,19 +16,26 @@ void cut2lr(void **A, int N, int M, int (*compare)()) {
   int depthLimit = 1 + 2.9 * floor(log(L));
   if ( L < cut2LRLimit ) { 
     // dflgm3(A, N, M, depthLimit, compare);
-    quicksort0c(A, N, M, depthLimit, compare);
+    quicksortmc(A, N, M, depthLimit, compare);
     return;
   }
   cut2lrc(A, N, M, depthLimit, compare);
 } // end cut2
 
 
-// cut2leftc does 2-partitioning with one pivot.
-// cut2leftc invokes dflgm when trouble is encountered.
+void cut2lrc1(void **A, int N, int M, int bufl[], int bufr[],
+	     int depthLimit, int (*compareXY)());
 void cut2lrc(void **A, int N, int M, 
-	       int depthLimit, int (*compareXY)()) {  
+	       int depthLimit, int (*compareXY)()) { 
   int bufl[bufSize];
   int bufr[bufSize];
+  cut2lrc1(A, N, M, bufl, bufr, depthLimit, compareXY);
+}
+
+// cut2leftc does 2-partitioning with one pivot.
+// cut2leftc invokes dflgm when trouble is encountered.
+void cut2lrc1(void **A, int N, int M, int bufl[], int bufr[],
+	       int depthLimit, int (*compareXY)()) {  
   int L;
  Start:
   // printf("cut2lrc N %d M %d %d\n", N, M, M-N);
@@ -49,7 +56,7 @@ void cut2lrc(void **A, int N, int M,
 
   if ( L < cut2LRLimit ) { 
     // dflgm3(A, N, M, depthLimit, compareXY);
-    quicksort0c(A, N, M, depthLimit, compareXY);
+    quicksortmc(A, N, M, depthLimit, compareXY);
     return;
   }
 
@@ -85,7 +92,7 @@ void cut2lrc(void **A, int N, int M,
 	if ( compareXY(ae5, ae3) <= 0) {
 	  // give up because cannot find a good pivot
 	  // dflgm is a dutch flag type of algorithm
-	  void cut2c();
+	  // void cut2lrc();
 	  dflgm(A, N, M, e3, cut2lrc, depthLimit, compareXY);
 	  return;
 	}
@@ -129,7 +136,6 @@ void cut2lrc(void **A, int N, int M,
     if ( compareXY(A[M1], middle) <= 0 ) {
       // give up because cannot find a good pivot
       // dflgm is a dutch flag type of algorithm
-      void cut2c();
       dflgm(A, N, M, middlex, cut2lrc, depthLimit, compareXY);
       return;
     }
@@ -251,7 +257,7 @@ MopUpL:
     }
     // */
     if ( (I - N) < (M - J) ) { // smallest one first
-      cut2lrc(A, N, J-1, depthLimit, compareXY);
+      cut2lrc1(A, N, J-1, bufl, bufr, depthLimit, compareXY);
       /*
       { int z; for ( z = N+1; z<J; z++ ) 
 		 if ( compareXY(A[z], A[z-1]) < 0 ) {
@@ -263,7 +269,7 @@ MopUpL:
       N = J; 
       goto Start;
     }
-    cut2lrc(A, J, M, depthLimit, compareXY);
+    cut2lrc1(A, J, M, bufl, bufr, depthLimit, compareXY);
     /*
       { int z; for ( z = J+1; z<=M; z++ ) 
 		 if ( compareXY(A[z], A[z-1]) < 0 ) {
@@ -276,4 +282,4 @@ MopUpL:
     goto Start;
 
 
-} // (*  OF cut2lrc; *) the brackets remind that this was once, 1985, Pascal code
+} // (*  OF cut2lrc1; *) the brackets remind that this was once, 1985, Pascal code

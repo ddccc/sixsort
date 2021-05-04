@@ -4,10 +4,10 @@
 // (C) OntoOO/ Dennis de Champeaux
 
 
-const int cut2Limit =  800;
+const int cut2Limit =  600;
 // extern int icnt; // invocation cnt
 
-void quicksort0c();
+
 void cut2c();
 // cut2 is used as a best in class quicksort implementation 
 // with a defense against quadratic behavior due to duplicates
@@ -18,8 +18,9 @@ void cut2(void **A, int N, int M, int (*compare)()) {
   int depthLimit = 1 + 2.9 * floor(log(L));
 
   if ( L < cut2Limit ) { 
-    quicksort0c(A, N, M, depthLimit, compare);
+    // quicksort0c(A, N, M, depthLimit, compare);
     // dflgm3(A, N, M, depthLimit, compare);
+    quicksortmc(A, N, M, depthLimit, compare);
     return;
   }
   cut2c(A, N, M, depthLimit, compare);
@@ -47,8 +48,9 @@ void cut2c(void **A, int N, int M, int depthLimit, int (*compareXY)()) {
   depthLimit--;
 
   if ( L < cut2Limit ) { 
+    // quicksort0c(A, N, M, depthLimit, compareXY);
     // dflgm3(A, N, M, depthLimit, compareXY);
-    quicksort0c(A, N, M, depthLimit, compareXY);
+    quicksortmc(A, N, M, depthLimit, compareXY);
     return;
   }
   // icnt++; // invocation cnt
