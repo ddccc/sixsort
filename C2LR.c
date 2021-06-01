@@ -2,7 +2,7 @@
 // Date: Wed Jun 10 15:37:30 2020, Fri May 28 21:24:28 2021
 // (C) OntoOO/ Dennis de Champeaux
 
-const int cut2LRLimit =  600; 
+const int cut2LRLimit =  700; 
 
 const int bufSize = 200;
 
@@ -11,7 +11,7 @@ void cut2lrc();
 
 void cut2lr(void **A, int N, int M, int (*compare)()) { 
   int L = M - N;
-  int depthLimit = 1 + 2.9 * floor(log(L));
+  int depthLimit = 2.9 * floor(log(L));
   if ( L < cut2LRLimit ) { 
     // dflgm3(A, N, M, depthLimit, compare);
     // quicksortmc(A, N, M, depthLimit, compare);

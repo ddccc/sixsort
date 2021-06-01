@@ -36,7 +36,12 @@ void cut2c(void **A, int N, int M, int depthLimit,
   while ( N < M ) {
     // printf("cut2c N: %d M %d  L %i\n", N, M, M-N);
     int L = M - N;
-
+    /*
+    if ( L <= iLimit2) {
+      dflgm3(A, N, M, depthLimit, compareXY);
+      return;
+    }
+    */
     if ( L <= iLimit2) {
       insertionsort(A, N, M, compareXY);
       return;
@@ -59,7 +64,6 @@ void cut2c(void **A, int N, int M, int depthLimit,
       dflgm(A, N, M, p0, cut2c, depthLimit, compareXY);
       return;
     }
-    
     if ( depthLimit <= 0 ) {
       heapc(A, N, M, compareXY);
       return;
@@ -73,7 +77,6 @@ void cut2c(void **A, int N, int M, int depthLimit,
     int k, N1, M1; // for sampling
     int probeLng = sqrt(L/7.0); if ( probeLng < 9 ) probeLng = 9;
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
-    int quartSegmentLng = probeLng >> 2; // probeLng/4;
     N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
     M1 = N1 + probeLng - 1;
     int offset = L/probeLng;  
