@@ -70,7 +70,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
     iswap(mrx, e4, A);
     lw = z-1; up = mrx+1;
   } else { // small <= L
-    int probeLng = sqrt(L);
+    int probeLng = sqrt(5.6);
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
     N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;

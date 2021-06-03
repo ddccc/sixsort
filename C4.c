@@ -17,7 +17,7 @@ void cut4(void **A, int N, int M, int (*compareXY)()) {
     return; 
   }
   // cut4c(N, M, 0); return; // for testing heapsort
-  int depthLimit = 1 + 2.9 * floor(log(L));
+  int depthLimit = 2.9 * floor(log(L));
   cut4c(A, N, M, depthLimit, compareXY);
 } // end cut4
 
@@ -30,7 +30,8 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
 
   // printf("cut4c %d %d \n", N, M);
   L = M - N +1; 
-  if ( L < 1024 * 256 ) {
+  //  if ( L < 1024 * 256 ) {
+  if ( L < 1024 * 200 ) {
     cut2lr(A, N, M, compareXY);
     return;
   }
@@ -88,7 +89,8 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
   } else 
   */
 { // small <= L, use a variable number for sampling
-    int probeLng = sqrt(L/5.8); 
+  // int probeLng = sqrt(L/5.8); 
+int probeLng = sqrt(L/5.6); 
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
     N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
