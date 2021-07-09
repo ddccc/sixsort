@@ -13,11 +13,11 @@ void cut2c();
 // cut2 is used as a best in class quicksort implementation 
 // with a defense against quadratic behavior due to duplicates
 // cut2 is a support function to call up the workhorse cut2c
-void cut2(void **A, int N, int M, int (*compare)()) { 
-  // printf("cut2 %d %d %d\n", N, M, M-N);
-  int L = M - N;
+void cut2(void **A, int lo, int hi, int (*compare)()) { 
+  // printf("cut2 %d %d %d\n", lo, hi, hi-lo);
+  int L = hi - lo;
   int depthLimit = 2.9 * floor(log(L));
-  cut2c(A, N, M, depthLimit, compare);
+  cut2c(A, lo, hi, depthLimit, compare);
 } // end cut2
 // calculate the median of 3
 int medq2(void **A, int a, int b, int c,
@@ -28,30 +28,30 @@ int medq2(void **A, int a, int b, int c,
     : compareXY( A[b], A[c] ) > 0 ? b : compareXY( A[a], A[c] ) > 0 ? c : a;
 } // end medq2
 
-void cut2c(void **A, int N, int M, int depthLimit, 
+void cut2c(void **A, int lo, int hi, int depthLimit, 
 		 int (*compareXY)(const void*, const void*)) {
-  // printf("Enter cut2c N: %d M: %d %d\n", N, M, depthLimit);
-  // printf(" gap %d \n", M-N);
+  // printf("Enter cut2c lo: %d hi: %d %d\n", lo, hi, depthLimit);
+  // printf(" gap %d \n", hi-lo);
 
-  while ( N < M ) {
-    // printf("cut2c N: %d M %d  L %i\n", N, M, M-N);
-    int L = M - N;
+  while ( lo < hi ) {
+    // printf("cut2c lo: %d hi %d  L %i\n", lo, hi, hi-lo);
+    int L = hi - lo;
     /*
     if ( L <= iLimit2) {
-      dflgm3(A, N, M, depthLimit, compareXY);
+      dflgm3(A, lo, hi, depthLimit, compareXY);
       return;
     }
     */
     if ( L <= iLimit2) {
-      insertionsort(A, N, M, compareXY);
+      insertionsort(A, lo, hi, compareXY);
       return;
     }
 
     if ( L < dflgmLimit2 ) {
-      int p0 = N + (L>>1); // N + L/2;
+      int p0 = lo + (L>>1); // lo + L/2;
       if ( 7 < L ) {
-	int pn = N;
-	int pm = M;
+	int pn = lo;
+	int pm = hi;
 	// if ( 51 < L ) {
 	if ( 40 < L ) {
 	  int d = (L-2)>>3; // L/8;
@@ -61,44 +61,44 @@ void cut2c(void **A, int N, int M, int depthLimit,
 	}
 	p0 = medq2(A, pn, p0, pm, compareXY);
       }
-      dflgm(A, N, M, p0, cut2c, depthLimit, compareXY);
+      dflgm(A, lo, hi, p0, cut2c, depthLimit, compareXY);
       return;
     }
     if ( depthLimit <= 0 ) {
-      heapc(A, N, M, compareXY);
+      heapc(A, lo, hi, compareXY);
       return;
     }
     depthLimit--;
 
     register void *T; // pivot
-    register int I = N, J = M; // indices
-    int middlex = N + (L>>1); // N + L/2
+    register int I = lo, J = hi; // indices
+    int middlex = lo + (L>>1); // lo + L/2
     void *middle;
-    int k, N1, M1; // for sampling
+    int k, lo1, hi1; // for sampling
     int probeLng = sqrt(L/7.0); if ( probeLng < 9 ) probeLng = 9;
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
-    N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
-    M1 = N1 + probeLng - 1;
+    lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
+    hi1 = lo1 + probeLng - 1;
     int offset = L/probeLng;  
 
-    // assemble the mini array [N1, M1]
-    for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
-      { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
+    // assemble the mini array [lo1, hi1]
+    for (k = 0; k < probeLng; k++) // iswap(lo1 + k, lo + k * offset, A);
+      { int xx = lo1 + k, yy = lo + k * offset; iswap(xx, yy, A); }
     // sort this mini array to obtain good pivots
-    // quicksort0c(A, N1, M1, depthLimit, compareXY);
-    cut2c(A, N1, M1, depthLimit, compareXY);
+    // quicksort0c(A, lo1, hi1, depthLimit, compareXY);
+    cut2c(A, lo1, hi1, depthLimit, compareXY);
     T = middle = A[middlex];
-    if ( compareXY(A[M1], middle) <= 0 ) {
+    if ( compareXY(A[hi1], middle) <= 0 ) {
       // give up because cannot find a good pivot
       // dflgm is a dutch flag type of algorithm
-      dflgm(A, N, M, middlex, cut2c, depthLimit, compareXY);
+      dflgm(A, lo, hi, middlex, cut2c, depthLimit, compareXY);
       return;
     }
-    for ( k = N1; k <= middlex; k++ ) {
+    for ( k = lo1; k <= middlex; k++ ) {
     iswap(k, I, A); I++;
     }
     I--;
-    for ( k = M1; middlex < k; k--) {
+    for ( k = hi1; middlex < k; k--) {
       iswap(k, J, A); J--;
     }
     J++;
@@ -117,12 +117,12 @@ void cut2c(void **A, int N, int M, int depthLimit,
       goto Left;
     }
     // Tail iteration
-    if ( (I - N) < (M - J) ) { // smallest one first
-      cut2c(A, N, J, depthLimit, compareXY);
-      N = I; 
+    if ( (I - lo) < (hi - J) ) { // smallest one first
+      cut2c(A, lo, J, depthLimit, compareXY);
+      lo = I; 
     } else {
-      cut2c(A, I, M, depthLimit, compareXY);
-      M = J;
+      cut2c(A, I, hi, depthLimit, compareXY);
+      hi = J;
     }
   } // end while
 } // (*  OF cut2; *) the brackets remind that this was once, 1985, Pascal code

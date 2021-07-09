@@ -13,37 +13,37 @@ int med(void **A, int a, int b, int c,
 
 void dflgm3();
 // dflgm0 is used as the driver of a sorter using dflgm3
-void dflgm0(void **A, int N, int M, int (*compareXY)(const void*, const void*)) {
-    // printf("dflgm0 %d %d %d\n", N, M, M-N);
-  int L = M - N;
+void dflgm0(void **A, int lo, int hi, int (*compareXY)(const void*, const void*)) {
+    // printf("dflgm0 %d %d %d\n", lo, hi, hi-lo);
+  int L = hi - lo;
   int depthLimit = 1 + 2.9 * floor(log(L));
-  dflgm3(A, N, M, depthLimit, compareXY);
+  dflgm3(A, lo, hi, depthLimit, compareXY);
 }
 // extern int icnt; // invocation cnt
-void dflgm3(void **A, int N, int M, 
+void dflgm3(void **A, int lo, int hi, 
            int depthLimit, int (*compareXY)(const void*, const void*)) {
     // Simple version of partitioning with: L/M/R
     // L < pivot, M = pivot, R > pivot
   int L;
  Again:;
-  // printf("dflgm3 %i M %i depthLimit %i\n", N,M,depthLimit);
-  L = M - N +1;
+  // printf("dflgm3 %i hi %i depthLimit %i\n", lo,hi,depthLimit);
+  L = hi - lo +1;
   if ( L <= 1 ) return;
 
   // if ( L < 12 ) { // insertionsort
   if ( L < 9 ) { // insertionsort
-    insertionsort(A, N, M, compareXY);
+    insertionsort(A, lo, hi, compareXY);
     return;
   }
   if ( depthLimit <= 0 ) {
-    heapc(A, N, M, compareXY);
+    heapc(A, lo, hi, compareXY);
     return;
   }
   depthLimit--;
-    int p0 = N + (L>>1); // N + L/2;
+    int p0 = lo + (L>>1); // lo + L/2;
     if ( 7 < L ) {
-      int pn = N;
-      int pm = M;
+      int pn = lo;
+      int pm = hi;
       if ( 49 < L ) {
 	int d = (L-2)>>3; // L/8;
 	pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
@@ -52,7 +52,7 @@ void dflgm3(void **A, int N, int M,
       }
       p0 = med(A, pn, p0, pm, compareXY);
     }
-    dflgm(A, N, M, p0, dflgm3, depthLimit, compareXY);
+    dflgm(A, lo, hi, p0, dflgm3, depthLimit, compareXY);
 
  
 } // end dflgm3

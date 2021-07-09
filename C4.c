@@ -7,65 +7,65 @@ const int cut4Limit = 500; // 1-pivot prefix bound
 
 void cut4c();
 // cut4 is doing 4-partitioning using 3 pivots
-void cut4(void **A, int N, int M, int (*compareXY)()) {
-  // printf("cut4 %d %d \n", N, M);
-  int L = M - N; 
+void cut4(void **A, int lo, int hi, int (*compareXY)()) {
+  // printf("cut4 %d %d \n", lo, hi);
+  int L = hi - lo; 
   if ( L < cut4Limit ) {
-    cut2(A, N, M, compareXY); 
-    // quicksort0(A, N, M, compareXY);
-    // heapc(A, N, M, compareXY); 
+    cut2(A, lo, hi, compareXY); 
+    // quicksort0(A, lo, hi, compareXY);
+    // heapc(A, lo, hi, compareXY); 
     return; 
   }
-  // cut4c(N, M, 0); return; // for testing heapsort
+  // cut4c(lo, hi, 0); return; // for testing heapsort
   int depthLimit = 2.9 * floor(log(L));
-  cut4c(A, N, M, depthLimit, compareXY);
+  cut4c(A, lo, hi, depthLimit, compareXY);
 } // end cut4
 
 // long int cnt2 = 0; 
 
-void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)()) 
+void cut4c(void **A, int lo, int hi, int depthLimit, int (*compareXY)()) 
 {
   int L;
  Start:
 
-  // printf("cut4c %d %d \n", N, M);
-  L = M - N +1; 
+  // printf("cut4c %d %d \n", lo, hi);
+  L = hi - lo +1; 
   //  if ( L < 1024 * 256 ) {
   if ( L < 1024 * 200 ) {
-    cut2lr(A, N, M, compareXY);
+    cut2lr(A, lo, hi, compareXY);
     return;
   }
   /*
   if ( L <= 1 ) return;
   // alternative prefix
   if ( L < cut4Limit ) {
-    // cut2c(A, N, M, depthLimit, compareXY);  // alternative
-    // quicksort0c(A, N, M, depthLimit, compareXY); 
-    d4c(A, N, M, depthLimit, compareXY); 
+    // cut2c(A, lo, hi, depthLimit, compareXY);  // alternative
+    // quicksort0c(A, lo, hi, depthLimit, compareXY); 
+    d4c(A, lo, hi, depthLimit, compareXY); 
     return; 
     }
   */
   if ( depthLimit <= 0 ) {
-    heapc(A, N, M, compareXY);
+    heapc(A, lo, hi, compareXY);
     return;
   }
   depthLimit--;
 
 
 
-  int k, N1, M1; // for sampling
+  int k, lo1, hi1; // for sampling
   int maxlx, middlex, mrx, minrx;  
   // pivots for left/ middle / right regions
   register void *maxl, *middle, *minr;   
   register int i, j, lw, up, z; // indices
-  i = N; j = M;
-  z = middlex = N + (L>>1); // N + L/2/
+  i = lo; j = hi;
+  z = middlex = lo + (L>>1); // lo + L/2/
   const int small = 900; 
   /*
   // const int small = 4000; 
   if ( L < small ) { // use 5 elements for sampling
     int e1, e2, e3, e4, e5;
-    e1 = maxlx = N; e5 = minrx = M; mrx = middlex+1;
+    e1 = maxlx = lo; e5 = minrx = hi; mrx = middlex+1;
     e3 = middlex;
     int quartSegmentLng = L >> 2; // L/4
     e2 = e3 - quartSegmentLng;
@@ -93,19 +93,19 @@ void cut4c(void **A, int N, int M, int depthLimit, int (*compareXY)())
 int probeLng = sqrt(L/5.6); 
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
-    N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
-    M1 = N1 + probeLng - 1;
-    maxlx = N1 + quartSegmentLng;
-    // int middlex = N1 + halfSegmentLng;
-    minrx = M1 - quartSegmentLng;
+    lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
+    hi1 = lo1 + probeLng - 1;
+    maxlx = lo1 + quartSegmentLng;
+    // int middlex = lo1 + halfSegmentLng;
+    minrx = hi1 - quartSegmentLng;
     mrx = middlex + (quartSegmentLng>>1);
     int offset = L/probeLng;  
 
-    // assemble the mini array [N1, M1]
-    for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
-    { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
+    // assemble the mini array [lo1, hi1]
+    for (k = 0; k < probeLng; k++) // iswap(lo1 + k, lo + k * offset, A);
+    { int xx = lo1 + k, yy = lo + k * offset; iswap(xx, yy, A); }
     // sort this mini array to obtain good pivots
-    cut4c(A, N1, M1, depthLimit, compareXY);
+    cut4c(A, lo1, hi1, depthLimit, compareXY);
     lw = maxlx; up = minrx;
   }
 
@@ -117,17 +117,17 @@ int probeLng = sqrt(L/5.6);
        compareXY(middle, A[mrx]) == 0 || 
        compareXY(A[mrx], minr) == 0 ) {
     // no good pivots available, thus escape
-    dflgm(A, N, M, middlex, cut4c, depthLimit, compareXY);
+    dflgm(A, lo, hi, middlex, cut4c, depthLimit, compareXY);
     return;
   }
 
   if ( small  <= L) {
     // Swap these two segments to the corners
-    for ( k = N1; k <= maxlx; k++ ) {
+    for ( k = lo1; k <= maxlx; k++ ) {
       iswap(k, i, A); i++;
     }
     i--;
-    for ( k = M1; minrx <= k; k--) {
+    for ( k = hi1; minrx <= k; k--) {
       iswap(k, j, A); j--;
     }
     j++;
@@ -138,13 +138,13 @@ int probeLng = sqrt(L/5.6);
   void *x, *y; // values  
   /* The last element in x must be insert somewhere. The hole
      location is used for this task */
-  int hole = N; x = A[++i]; // x is the first element to be inserted somewhere
-  A[i] = A[N]; 
+  int hole = lo; x = A[++i]; // x is the first element to be inserted somewhere
+  A[i] = A[lo]; 
 
   // Here the general layout
    /*   L             ML         MR             R
     |-----]------+[---------]---------]+-----[-----|
-    N     i      lw         z         up     j     M
+    lo    i      lw         z         up     j     hi
    */
 
     /* ***********
@@ -157,20 +157,20 @@ int probeLng = sqrt(L/5.6);
      for machine assisted correctness proofs):
      maxl < middle < minr
      If there are two gaps:
-       N < x <= i --> A[x] <= maxl
+       lo < x <= i --> A[x] <= maxl
        lw < x <= z --> maxl < A[x] <= middle
        z < x < up --> middle < A[x] < minr
-       j <= x <= M --> minr <= A[x]
+       j <= x <= hi --> minr <= A[x]
      If the left gap has closed:
-       N < x < i --> A[x] <= maxl
+       lo < x < i --> A[x] <= maxl
        i <= x <= z --> maxl < A[x] <= middle
        z <  x < up --> middle < A[x] < minr
-       j <= x <= M --> minr <= A[x]
+       j <= x <= hi --> minr <= A[x]
      If the right gap has closed:
-       N < x <= i --> A[x] <= maxl
+       lo < x <= i --> A[x] <= maxl
        lw < x <= z --> maxl < A[x] <= middle
        z < x <= j --> middle < A[x] < minr
-       j < x <= M --> minr <= A[x]
+       j < x <= hi --> minr <= A[x]
   */
 
 
@@ -182,7 +182,7 @@ int probeLng = sqrt(L/5.6);
 
    /*   L             ML         MR             R
     o-----]------+[---------]---------]+-----[-----|
-    N     i      lw         z         up     j     M
+    lo    i      lw         z         up     j     hi
    */
 
   // if ( x <= middle ) {
@@ -200,7 +200,7 @@ int probeLng = sqrt(L/5.6);
  TLgMLMRgRL:
          /*   L                              R
 	   |o----]---------+[-|-]+--------[-----|
-	   N     i        lw     up       j     M
+	   lo    i        lw     up       j     hi
            x -> L             z
 	 */
 	i++;
@@ -211,7 +211,7 @@ int probeLng = sqrt(L/5.6);
 	  if ( lw < i ) {
 	 /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i           z  up       j     M
+	   lo     i           z  up       j     hi
            x -> L             
 	 */
 	    goto TLMLMRgRL;
@@ -231,7 +231,7 @@ int probeLng = sqrt(L/5.6);
  TLgMLMRgRML:
          /*   L                              R
 	   |o----]---------+[-|-]+--------[-----|
-	   N     i        lw     up       j     M
+	   lo    i        lw     up       j     hi
            x -> ML            z
 	 */
 	y = A[lw];
@@ -247,7 +247,7 @@ int probeLng = sqrt(L/5.6);
 	    i++;
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	   lo     i              up       j     hi
            x -> ML            z
 	 */
 	    goto TLMLMRgRML;
@@ -268,7 +268,7 @@ int probeLng = sqrt(L/5.6);
  TLgMLMRgRR:
          /*   L                              R
 	   |o----]---------+[-|-]+--------[-----|
-	   N     i        lw     up       j     M
+	   lo    i        lw     up       j     hi
            x -> R             z
 	 */
 	j--;
@@ -294,7 +294,7 @@ int probeLng = sqrt(L/5.6);
 	// right gap closed
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	   lo    i        lw          j      M
            x -> R             z
 	 */
 	goto TLgMLMRRR;
@@ -302,7 +302,7 @@ int probeLng = sqrt(L/5.6);
  TLgMLMRgRMR:
          /*   L                              R
 	   |o----]---------+[-|-]+--------[-----|
-	   N     i        lw     up       j     M
+	   lo    i        lw     up       j     M
            x -> MR            z
 	 */
 	y = A[up];
@@ -331,7 +331,7 @@ int probeLng = sqrt(L/5.6);
 	j--;
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	   lo    i        lw          j      hi
            x -> MR            z
 	 */
 	goto TLgMLMRRMR;
@@ -341,7 +341,7 @@ int probeLng = sqrt(L/5.6);
  TLgMLMRRR:
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	   lo    i        lw          j      hi
            x -> R             z
 	 */
 	y = A[lw];
@@ -376,7 +376,7 @@ int probeLng = sqrt(L/5.6);
  TLgMLMRRMR:
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	   lo    i        lw          j      hi
            x -> MR            z
 	 */
 	y = A[lw];
@@ -411,7 +411,7 @@ int probeLng = sqrt(L/5.6);
  TLgMLMRRML:
         /*   L                         R
 	   |o----]------+[--|------][-----|
-	   N     i     lw          j      M
+	   lo    i     lw          j      hi
            x -> ML          z
 	 */
 	y = A[lw];
@@ -447,7 +447,7 @@ int probeLng = sqrt(L/5.6);
  TLgMLMRRL:
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	   lo    i        lw          j      hi
            x -> L             z
 	 */
 	i++;
@@ -475,7 +475,7 @@ int probeLng = sqrt(L/5.6);
  TLMLMRgRL:
         /*   L                               R
 	   |o----][-----------|-]+--------[-----|
-	   N      i           z  up       j     M
+	   lo     i           z  up       j     hi
            x -> L             
 	 */
 	y = A[up];
@@ -513,7 +513,7 @@ int probeLng = sqrt(L/5.6);
  TLMLMRgRML:
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	   lo     i              up       j     hi
            x -> ML            z
 	 */
 	y = A[up];
@@ -552,7 +552,7 @@ int probeLng = sqrt(L/5.6);
  TLMLMRgRR:
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	   lo     i              up       j     hi
            x -> R             z
 	 */
 	j--;
@@ -574,7 +574,7 @@ int probeLng = sqrt(L/5.6);
 	  x = y;
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	   lo     i              up       j     hi
            x -> MR            z
 	 */
 	  goto TLMLMRgRMR;
@@ -588,7 +588,7 @@ int probeLng = sqrt(L/5.6);
  TLMLMRgRMR:
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	   lo     i              up       j     hi
            x -> MR            z
 	 */
 	y = A[up];
@@ -629,57 +629,57 @@ int probeLng = sqrt(L/5.6);
 	// int k; // for testing
 
  Finish4:
-	// printf("cut4 exit Finish4 N: %d M: %d\n", N, M);
+	// printf("cut4 exit Finish4 lo: %d hi: %d\n", lo, hi);
          /*   L        ML         MR         R
 	   |-----][----------|-----------][-----|
-	   N     i           z            j     M
+	   lo    i           z            j     hi
 	 */
 	/* // for checking:
 	   // Checking ML and MR requires making a copy of middle 
-	   // (which was at A[N]) somewhere before arriving here
-	for (k = N; k < i; k++)
+	   // (which was at A[lo]) somewhere before arriving here
+	for (k = lo; k < i; k++)
 	//  if ( maxl < A[k] ) {
 	  if ( compareXY(maxl, A[k]) < 0 ) {
-	    printf("Error L k%i N %i i %i z %i j %i M %i\n", k,N,i,z,j,M);
+	    printf("Error L k%i lo %i i %i z %i j %i hi %i\n", k,lo,i,z,j,hi);
 	    exit(0);
 	  }
 	for (k = j; k <= M; k++)
 	//  if ( A[k] < minr <  ) {
 	  if ( compareXY(A[k], minr) < 0 ) {
-	    printf("Error R k%i N %i i %i z %i j %i M %i\n", k,N,i,z,j,M);
+	    printf("Error R k%i lo %i i %i z %i j %i hi %i\n", k,lo,i,z,j,hi);
 	    exit(0);
 	  }
 	*/	
 
-	if ( z-N < M-z ) {
-	  cut4c(A, N, i, depthLimit, compareXY);
+	if ( z-lo < hi-z ) {
+	  cut4c(A, lo, i, depthLimit, compareXY);
 	  cut4c(A, i+1, z, depthLimit, compareXY);
-	  if ( j-z < M-j ) {
+	  if ( j-z < hi-j ) {
 	    cut4c(A, z+1, j-1, depthLimit, compareXY);
-	    // cut4c(A, j, M, depthLimit, compareXY);
+	    // cut4c(A, j, hi, depthLimit, compareXY);
 	    // return;
-	    N = j;
+	    lo = j;
 	    goto Start;
 	  }
-	  cut4c(A, j, M, depthLimit, compareXY);
+	  cut4c(A, j, hi, depthLimit, compareXY);
 	  // cut4c(A, z+1, j-1, depthLimit, compareXY);
 	  // return;
-	  N = z+1; M = j-1;
+	  lo = z+1; hi = j-1;
 	  goto Start;
 	}
-	// M-z <= z-N
+	// hi-z <= z-lo
 	cut4c(A, z+1, j-1, depthLimit, compareXY);
-	cut4c(A, j, M, depthLimit, compareXY);
-	if ( i-N < z-i ) {
-	  cut4c(A, N, i, depthLimit, compareXY);
+	cut4c(A, j, hi, depthLimit, compareXY);
+	if ( i-lo < z-i ) {
+	  cut4c(A, lo, i, depthLimit, compareXY);
 	  // cut4c(A, i+1, z, depthLimit, compareXY);
 	  // return;
-	  N = i+1; M = z;
+	  lo = i+1; hi = z;
 	  goto Start;
 	}
 	cut4c(A, i+1, z, depthLimit, compareXY);
-	// cut4c(A, N, i, depthLimit, compareXY);
-	M = i;
+	// cut4c(A, lo, i, depthLimit, compareXY);
+	hi = i;
 	goto Start;
 } // end cut4c
 

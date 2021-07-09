@@ -9,79 +9,79 @@ const int bufSize = 200;
 #define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
 void cut2lrc();
 
-void cut2lr(void **A, int N, int M, int (*compare)()) { 
-  int L = M - N;
+void cut2lr(void **A, int lo, int hi, int (*compare)()) { 
+  int L = hi - lo;
   int depthLimit = 2.9 * floor(log(L));
   if ( L < cut2LRLimit ) { 
-    // dflgm3(A, N, M, depthLimit, compare);
-    // quicksortmc(A, N, M, depthLimit, compare);
-    cut2c(A, N, M, depthLimit, compare);
+    // dflgm3(A, lo, hi, depthLimit, compare);
+    // quicksortmc(A, lo, hi, depthLimit, compare);
+    cut2c(A, lo, hi, depthLimit, compare);
     return;
   }
-  cut2lrc(A, N, M, depthLimit, compare);
+  cut2lrc(A, lo, hi, depthLimit, compare);
 } // end cut2lr
 
 
-void cut2lrc1(void **A, int N, int M, int bufl[], int bufr[],
+void cut2lrc1(void **A, int lo, int hi, int bufl[], int bufr[],
 	     int depthLimit, int (*compareXY)());
-void cut2lrc(void **A, int N, int M, 
+void cut2lrc(void **A, int lo, int hi, 
 	       int depthLimit, int (*compareXY)()) { 
   int bufl[bufSize];
   int bufr[bufSize];
-  cut2lrc1(A, N, M, bufl, bufr, depthLimit, compareXY);
+  cut2lrc1(A, lo, hi, bufl, bufr, depthLimit, compareXY);
 }
 
-void cut2lrc1(void **A, int N, int M, int bufl[], int bufr[],
+void cut2lrc1(void **A, int lo, int hi, int bufl[], int bufr[],
 	       int depthLimit, int (*compareXY)()) {  
   int L;
  Start:
-  // printf("cut2lrc1 N %d M %d %d\n", N, M, M-N);
+  // printf("cut2lrc1 lo %d hi %d %d\n", lo, hi, hi-lo);
 
-  L = M - N;
+  L = hi - lo;
   if ( L <= 0 ) return;
   if ( L < cut2LRLimit ) { 
-    // dflgm3(A, N, M, depthLimit, compareXY);
-    // quicksortmc(A, N, M, depthLimit, compareXY);
-    cut2c(A, N, M, depthLimit, compareXY);
+    // dflgm3(A, lo, hi, depthLimit, compareXY);
+    // quicksortmc(A, lo, hi, depthLimit, compareXY);
+    cut2c(A, lo, hi, depthLimit, compareXY);
     return;
   }
 
   if ( depthLimit <= 0 ) {
-    heapc(A, N, M, compareXY);
+    heapc(A, lo, hi, compareXY);
     return;
   }
   depthLimit--;
 
   register void *T; // pivot
-  register int I = N, J = M; // indices
-  int middlex = N + (L>>1); // N + L/2
+  register int I = lo, J = hi; // indices
+  int middlex = lo + (L>>1); // lo + L/2
   void *middle;
-  int k, N1, M1; // for sampling
+  int k, lo1, hi1; // for sampling
     int probeLng = sqrt(L/7.0); if ( probeLng < 9 ) probeLng = 9;
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
-    N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
-    M1 = N1 + probeLng - 1;
+    lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
+    hi1 = lo1 + probeLng - 1;
     int offset = L/probeLng;  
 
-    // assemble the mini array [N1, M1]
-    for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
-      { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
+    // assemble the mini array [lo1, hi1]
+    for (k = 0; k < probeLng; k++) // iswap(lo1 + k, lo + k * offset, A);
+      { int xx = lo1 + k, yy = lo + k * offset; iswap(xx, yy, A); }
     // sort this mini array to obtain good pivots
-    // quicksort0c(A, N1, M1, depthLimit, compareXY);
-    // cut2c(A, N1, M1, depthLimit, compareXY);
-    cut2c(A, N1, M1, depthLimit, compareXY);
+    // quicksort0c(A, lo1, hi1, depthLimit, compareXY);
+    // cut2c(A, lo1, hi1, depthLimit, compareXY);
+    cut2c(A, lo1, hi1, depthLimit, compareXY);
     T = middle = A[middlex];
-    if ( compareXY(A[M1], middle) <= 0 ) {
+    if ( compareXY(A[hi1], middle) <= 0 ) {
       // give up because cannot find a good pivot
       // dflgm is a dutch flag type of algorithm
-      dflgm(A, N, M, middlex, cut2c, depthLimit, compareXY);
+      dflgm(A, lo, hi, middlex, cut2c, depthLimit, compareXY);
       return;
     }
-    for ( k = N1; k <= middlex; k++ ) {
+    for ( k = lo1; k <= middlex; k++ ) {
     iswap(k, I, A); I++;
     }
     I--;
-    for ( k = M1; middlex < k; k--) {
+    for ( k = hi1; middlex < k; k--) {
       iswap(k, J, A); J--;
     }
     J++;
@@ -95,7 +95,7 @@ void cut2lrc1(void **A, int N, int M, int bufl[], int bufr[],
 
   /*
        |------]--------------------[------|
-       N      I                    J      M
+       lo     I                    J      hi
    */
 Left:
   kl = kr = -1;
@@ -106,13 +106,13 @@ Left:
   }
   /*
        |-------*--*---*-]----------[------|
-       N                I          J      M
+       lo               I          J      hi
   */
   /*
-  { int z; for ( z = J; z<=M; z++ ) 
+  { int z; for ( z = J; z<=hi; z++ ) 
 		 if ( compareXY(A[z], T) < 0 ) {
-		   printf("ERR4 %d %d %d", N, M, M-N);
-		   printf(" Err4 J %i M %i z %i\n", J, M, z);
+		   printf("ERR4 %d %d %d", lo, hi, hi-lo);
+		   printf(" Err4 J %i hi %i z %i\n", J, hi, z);
 		   exit(0);
 		 }
   }
@@ -127,7 +127,7 @@ Left:
 
   /*
     |-------*--*---*-]----[--*--*-*-------|
-    N                I    J               M
+    lo               I    J               hi
   */
   // swap them
   // printf("DD kl %i kr %i \n", kl, kr);
@@ -147,10 +147,10 @@ Left:
   }
 
   /*
-  { int z; for ( z = J; z<=M; z++ ) 
+  { int z; for ( z = J; z<=hi; z++ ) 
 		 if ( compareXY(A[z], T) < 0 ) {
-		   printf("ERR8 %d %d %d", N, M, M-N);
-		   printf(" Err8 J %i M %i z %i\n", J, M, z);
+		   printf("ERR8 %d %d %d", lo, hi, hi-lo);
+		   printf(" Err8 J %i hi %i z %i\n", J, hi, z);
 		   exit(0);
 		 }
   }
@@ -158,14 +158,14 @@ Left:
 MopUpL:
   /*
        |--------------*---*----*--[------|
-       N                          J      M
+       lo                         J      hi
 
    */
   /*
-  { int z; for ( z = J; z<=M; z++ ) 
+  { int z; for ( z = J; z<=hi; z++ ) 
 		 if ( compareXY(A[z], T) < 0 ) {
-		   printf("ERR3 %d %d %d", N, M, M-N);
-		   printf(" Err3 J %i M %i z %i\n", J, M, z);
+		   printf("ERR3 %d %d %d", lo, hi, hi-lo);
+		   printf(" Err3 J %i hi %i z %i\n", J, hi, z);
 		   exit(0);
 		 }
   }
@@ -178,43 +178,43 @@ MopUpL:
     { int z = J-1; iswap(z, idxl, A); J = z; }
   }
     /*
-    { int z; for ( z = J; z<=M; z++ ) 
+    { int z; for ( z = J; z<=hi; z++ ) 
 		 if ( compareXY(A[z], T) < 0 ) {
-		   printf("ERR6 %d %d %d", N, M, M-N);
-		   printf(" Err6 %i %i z %i\n", J, M, z);
+		   printf("ERR6 %d %d %d", lo, hi, hi-lo);
+		   printf(" Err6 %i %i z %i\n", J, hi, z);
 		   exit(0);
 		 }
     }
-    { int z; for ( z = N; z<=J-1; z++ ) 
+    { int z; for ( z = lo; z<=J-1; z++ ) 
 	       if ( compareXY(T, A[z]) < 0 ) {
-		   printf("ERR7 %d %d %d", N, M, M-N);
-		   printf(" Err7 %i %i z %i\n", N, J-1, z);
+		   printf("ERR7 %d %d %d", lo, hi, hi-lo);
+		   printf(" Err7 %i %i z %i\n", lo, J-1, z);
 		   exit(0);
 		 }
     }
     // */
-    if ( (I - N) < (M - J) ) { // smallest one first
-      cut2lrc1(A, N, J-1, bufl, bufr, depthLimit, compareXY);
+    if ( (I - lo) < (hi - J) ) { // smallest one first
+      cut2lrc1(A, lo, J-1, bufl, bufr, depthLimit, compareXY);
       /*
-      { int z; for ( z = N+1; z<J; z++ ) 
+      { int z; for ( z = lo+1; z<J; z++ ) 
 		 if ( compareXY(A[z], A[z-1]) < 0 ) {
-		   printf("Err1 %i %i z %i\n", N, J-1, z);
+		   printf("Err1 %i %i z %i\n", lo, J-1, z);
 		   exit(0);
 		 }
       }
       // */
-      N = J; 
+      lo = J; 
       goto Start;
     }
-    cut2lrc1(A, J, M, bufl, bufr, depthLimit, compareXY);
+    cut2lrc1(A, J, hi, bufl, bufr, depthLimit, compareXY);
     /*
-      { int z; for ( z = J+1; z<=M; z++ ) 
+      { int z; for ( z = J+1; z<=hi; z++ ) 
 		 if ( compareXY(A[z], A[z-1]) < 0 ) {
-		   printf("Err2 %i %i z %i\n", J, M, z);
+		   printf("Err2 %i %i z %i\n", J, hi, z);
 		   exit(0);
 		 }
       }
       // */
-    M = J-1;
+    hi = J-1;
     goto Start;
 } // (*  OF cut2lrc1; *) the brackets remind that this was once, 1985, Pascal code

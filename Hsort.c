@@ -12,16 +12,20 @@ void iswap(int p, int q, void **A) {
 
 #define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
 
-void heapSort();
-void heapc(void **A, int N, int M, int (*compare)()) {
-  // printf("heapc: %d %d\n", N, M);
-  if ( M <= N ) return;
-  heapSort(&A[N], M-N+1, compare);
+// #include "Isort.c" // insertionsort member
+
+void heapSort(void **, int, int (*)(const void*, const void*));
+static void heapify(void **, int, int (*)(const void*, const void*));
+static void siftDown(void **, int, int, int (*)(const void*, const void*));
+
+
+void heapc(void **A, int lo, int hi, int (*compare)(const void*, const void*)) {
+  // printf("heapc: %d %d\n", lo, hi);
+  if ( hi <= lo ) return;
+  heapSort(&A[lo], hi-lo+1, compare);
 } // end heapc
 
-void heapify();
-void siftDown();
-void heapSort(void **a, int count, int (*compare)()) {
+void heapSort(void **a, int count, int (*compare)(const void*, const void*)) {
   // input:  an unordered array a of length count
   // first place a in max-heap order
   heapify(a, count, compare);
@@ -40,7 +44,8 @@ void heapSort(void **a, int count, int (*compare)()) {
   }
 } // end heapSort
          
-void heapify(void **a, int count, int (*compare)()) {
+static void heapify(void **a, int count,
+                    int (*compare)(const void*, const void*)) {
   // (start is assigned the index in a of the last parent node)
   int start = (count - 2) / 2;
   while ( 0 <= start ) {
@@ -51,7 +56,8 @@ void heapify(void **a, int count, int (*compare)()) {
   } // (after sifting down the root all nodes/elements are in heap order)
 } // end heapify
  
-void siftDown(void **a, int start, int end, int (*compare)()) {
+static void siftDown(void **a, int start, int end,
+                     int (*compare)(const void*, const void*)) {
   // input:  end represents the limit of how far down the heap to sift.
   int root = start;
   int child, swapi;

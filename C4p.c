@@ -6,49 +6,49 @@ int cut4Limit4 = 500; // transition to 1-pivot
 
 void cut4Pc();
 // cut4P is doing 4-partitioning using 3 pivots
-void cut4P(void **A, int N, int M, int (*compare)()) {
-  // printf("cut4P %d %d \n", N, M);
-  int L = M - N; 
-  // cut4Pc(N, M, 0); return; // for testing heapsort
+void cut4P(void **A, int lo, int hi, int (*compare)()) {
+  // printf("cut4P %d %d \n", lo, hi);
+  int L = hi - lo; 
+  // cut4Pc(lo, hi, 0); return; // for testing heapsort
   int depthLimit = 2.9 * floor(log(L));
   if ( L < cut4Limit4 ) {
-    // quicksort0(A, N, M, compare); 
-    cut2c(A, N, M, depthLimit, compare);
+    // quicksort0(A, lo, hi, compare); 
+    cut2c(A, lo, hi, depthLimit, compare);
     return; 
   }
-  cut4Pc(A, N, M, depthLimit, compare);
+  cut4Pc(A, lo, hi, depthLimit, compare);
 } // end cut4P
 
-void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)()) 
+void cut4Pc(void **A, int lo, int hi, int depthLimit, int (*compareXY)()) 
 {
  Start: ;
-  // printf("cut4Pc %d %d  %d\n", N, M, depthLimit);
-  int L = M - N + 1; 
+  // printf("cut4Pc %d %d  %d\n", lo, hi, depthLimit);
+  int L = hi - lo + 1; 
   if ( L <= 1 ) return;
   if ( L < cut4Limit4 ) {
-    // quicksort0c(A, N, M, depthLimit, compareXY); 
-    // d4c(A, N, M, depthLimit, compareXY); 
-    cut2c(A, N, M, depthLimit, compareXY); 
+    // quicksort0c(A, lo, hi, depthLimit, compareXY); 
+    // d4c(A, lo, hi, depthLimit, compareXY); 
+    cut2c(A, lo, hi, depthLimit, compareXY); 
     return; 
   }
   if ( depthLimit <= 0 ) {
-    heapc(A, N, M, compareXY);
+    heapc(A, lo, hi, compareXY);
     return;
   }
   depthLimit--;
 
-  int k, N1, M1; // for sampling
+  int k, lo1, hi1; // for sampling
   int maxlx, middlex, mrx, minrx;  
   // pivots for left/ middle / right regions
   register void *maxl, *middle, *minr;
   register int i, j, lw, up, z; // indices
-  i = N; j = M;
-  z = middlex = N + (L>>1); // N + L/2
+  i = lo; j = hi;
+  z = middlex = lo + (L>>1); // lo + L/2
 
   const int small = 900; 
   if ( L < small ) { // use 5 elements for sampling
     int e1, e2, e3, e4, e5;
-    e1 = maxlx = N; e5 = minrx = M; mrx = middlex+1;
+    e1 = maxlx = lo; e5 = minrx = hi; mrx = middlex+1;
     e3 = middlex;
     int quartSegmentLng = L >> 2; // L/4
     e2 = e3 - quartSegmentLng;
@@ -73,32 +73,32 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
     int probeLng = sqrt(5.6);
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
-    N1 = middlex - halfSegmentLng; //  N + (L>>1) - halfSegmentLng;
-    M1 = N1 + probeLng - 1;
-    maxlx = N1 + quartSegmentLng;
-    // int middlex = N1 + halfSegmentLng;
-    minrx = M1 - quartSegmentLng;
+    lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
+    hi1 = lo1 + probeLng - 1;
+    maxlx = lo1 + quartSegmentLng;
+    // int middlex = lo1 + halfSegmentLng;
+    minrx = hi1 - quartSegmentLng;
     mrx = middlex + (quartSegmentLng>>1);
     int offset = L/probeLng;  
 
-    // assemble the mini array [N1, M1]
-    for (k = 0; k < probeLng; k++) // iswap(N1 + k, N + k * offset, A);
-    { int xx = N1 + k, yy = N + k * offset; iswap(xx, yy, A); }
+    // assemble the mini array [lo1, hi1]
+    for (k = 0; k < probeLng; k++) // iswap(lo1 + k, lo + k * offset, A);
+    { int xx = lo1 + k, yy = lo + k * offset; iswap(xx, yy, A); }
     // sort this mini array to obtain good pivots
     /*
-    if ( probeLng < 120 ) quicksort0c(A, N1, M1, depthLimit, compareXY); else {
+    if ( probeLng < 120 ) quicksort0c(A, lo1, hi1, depthLimit, compareXY); else {
       // protect against constant arrays
-      int p0 = N1 + (probeLng>>1);
-      int pn = N1, pm = M1, d = (probeLng-3)>>3;
+      int p0 = lo1 + (probeLng>>1);
+      int pn = lo1, pm = hi1, d = (probeLng-3)>>3;
       pn = med(A, pn, pn + d, pn + 2 * d, compareXY);
       p0 = med(A, p0 - d, p0, p0 + d, compareXY);
       pm = med(A, pm - 2 * d, pm - d, pm, compareXY);
       p0 = med(A, pn, p0, pm, compareXY);
-      dflgm(A, N1, M1, p0, quicksort0c, depthLimit, compareXY);
+      dflgm(A, lo1, hi1, p0, quicksort0c, depthLimit, compareXY);
     }
     */
-    // quicksort0c(A, N1, M1, depthLimit, compareXY);
-    cut2c(A, N1, M1, depthLimit, compareXY);
+    // quicksort0c(A, lo1, hi1, depthLimit, compareXY);
+    cut2c(A, lo1, hi1, depthLimit, compareXY);
     lw = maxlx; up = minrx;
   }
 
@@ -110,17 +110,17 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
        compareXY(middle, A[mrx]) == 0 || 
        compareXY(A[mrx], minr) == 0 ) {
     // no good pivots available, thus escape
-    dflgm(A, N, M, middlex, cut4Pc, depthLimit, compareXY);
+    dflgm(A, lo, hi, middlex, cut4Pc, depthLimit, compareXY);
     return;
   }
 
   if ( small  <= L) {
     // Swap these two segments to the corners
-    for ( k = N1; k <= maxlx; k++ ) {
+    for ( k = lo1; k <= maxlx; k++ ) {
       iswap(k, i, A); i++;
     }
     i--;
-    for ( k = M1; minrx <= k; k--) {
+    for ( k = hi1; minrx <= k; k--) {
       iswap(k, j, A); j--;
     }
     j++;
@@ -130,14 +130,14 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
   void *x, *y; // values 
   /* The last element in x must be insert somewhere. The hole
      location is used for this task */
-  int hole = N; x = A[++i]; // x is the first element to be inserted somewhere
-  A[i] = A[N];
+  int hole = lo; x = A[++i]; // x is the first element to be inserted somewhere
+  A[i] = A[lo];
 
 
   // Here the general layout:
    /*   L             ML         MR             R
     |-----]------+[---------]---------]+-----[-----|
-    N     i      lw         z         up     j     M
+   lo     i      lw         z         up     j     hi
    */
 
       /* ***********
@@ -149,20 +149,20 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
      for machine assisted correctness proofs):
      maxl < middle < minr
      If there are two gaps:
-       N < x <= i --> A[x] <= maxl
+       lo < x <= i --> A[x] <= maxl
        lw < x <= z  --> maxl < A[x] <= middle
        z < x < up  --> middle < A[x] < minr
-       j <= x <= M --> minr <= A[x]
+       j <= x <= hi --> minr <= A[x]
      If the left gap has closed:
-       N < x < i --> A[x] <= maxl
+       lo < x < i --> A[x] <= maxl
        i <= x <= z --> maxl < A[x] <= middle
        z <  x < up  --> middle < A[x] < minr
-       j <= x <= M --> minr <= A[x]
+       j <= x <= hi --> minr <= A[x]
      If the right gap has closed:
-       N < x <= i --> A[x] <= maxl
+       lo < x <= i --> A[x] <= maxl
        lw < x <= z  --> maxl < A[x] <= middle
        z < x <= j  --> middle < A[x] < minr
-       j < x <= M --> minr <= A[x]
+       j < x <= hi --> minr <= A[x]
   */
 
   /* We employ again whack-a-mole. We know in which partition element x 
@@ -173,7 +173,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
 
    /*   L             ML         MR             R
     o-----]------+[---------]---------]+-----[-----|
-    N     i      lw         z         up     j     M
+   lo     i      lw         z         up     j     hi
    */
 
   // if ( x <= middle ) {
@@ -191,7 +191,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLgMLMRgRL:
          /*   L                              R
 	   |o----]---------+[-|-]+--------[-----|
-	   N     i        lw     up       j     M
+	  lo     i        lw     up       j     hi
            x -> L             z
 	 */
 	i++;
@@ -202,7 +202,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
 	  if ( lw < i ) {
 	 /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i           z  up       j     M
+	  lo      i           z  up       j     hi
            x -> L             
 	 */
 	    goto TLMLMRgRL;
@@ -222,7 +222,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLgMLMRgRML:
          /*   L                              R
 	   |o----]---------+[-|-]+--------[-----|
-	   N     i        lw     up       j     M
+	  lo     i        lw     up       j     hi
            x -> ML            z
 	 */
 	y = A[lw];
@@ -238,7 +238,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
 	    i++;
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	  lo      i              up       j     hi
            x -> ML            z
 	 */
 	    goto TLMLMRgRML;
@@ -259,7 +259,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLgMLMRgRR:
          /*   L                              R
 	   |o----]---------+[-|-]+--------[-----|
-	   N     i        lw     up       j     M
+	  lo     i        lw     up       j     hi
            x -> R             z
 	 */
 	j--;
@@ -285,7 +285,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
 	// right gap closed
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	  lo     i        lw          j      hi
            x -> R             z
 	 */
 	goto TLgMLMRRR;
@@ -293,7 +293,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLgMLMRgRMR:
          /*   L                              R
 	   |o----]---------+[-|-]+--------[-----|
-	   N     i        lw     up       j     M
+          lo     i        lw     up       j     hi
            x -> MR            z
 	 */
 	y = A[up];
@@ -322,7 +322,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
 	j--;
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	  lo     i        lw          j      hi
            x -> MR            z
 	 */
 	goto TLgMLMRRMR;
@@ -332,7 +332,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLgMLMRRR:
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	  lo     i        lw          j      hi
            x -> R             z
 	 */
 	y = A[lw];
@@ -367,7 +367,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLgMLMRRMR:
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	  lo     i        lw          j      hi
            x -> MR            z
 	 */
 	y = A[lw];
@@ -402,7 +402,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLgMLMRRML:
         /*   L                         R
 	   |o----]------+[--|------][-----|
-	   N     i     lw          j      M
+	  lo     i     lw          j      hi
            x -> ML          z
 	 */
 	y = A[lw];
@@ -438,7 +438,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLgMLMRRL:
          /*   L                           R
 	   |o----]---------+[-|-------][-----|
-	   N     i        lw          j      M
+	  lo     i        lw          j      hi
            x -> L             z
 	 */
 	i++;
@@ -466,7 +466,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLMLMRgRL:
         /*   L                               R
 	   |o----][-----------|-]+--------[-----|
-	   N      i           z  up       j     M
+	  lo      i           z  up       j     hi
            x -> L             
 	 */
 	y = A[up];
@@ -504,7 +504,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLMLMRgRML:
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	  lo      i              up       j     hi
            x -> ML            z
 	 */
 	y = A[up];
@@ -543,7 +543,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLMLMRgRR:
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	  lo      i              up       j     hi
            x -> R             z
 	 */
 	j--;
@@ -565,7 +565,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
 	  x = y;
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+          lo      i              up       j     hi
            x -> MR            z
 	 */
 	  goto TLMLMRgRMR;
@@ -579,7 +579,7 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
  TLMLMRgRMR:
          /*   L                              R
 	   |o----][-----------|-]+--------[-----|
-	   N      i              up       j     M
+	  lo      i              up       j     hi
            x -> MR            z
 	 */
 	y = A[up];
@@ -620,56 +620,56 @@ void cut4Pc(void **A, int N, int M, int depthLimit, int (*compareXY)())
 	// int k; // for testing
 
  Finish4:
-	// printf("cut4P exit Finish4 N: %d M: %d\n", N, M);
+	// printf("cut4P exit Finish4 lo: %d hi: %d\n", lo, hi);
          /*   L        ML         MR         R
 	   |-----][----------|-----------][-----|
-	   N     i           z            j     M
+	  lo     i           z            j     hi
 	 */
-	if ( z-N < M-z ) {
+	if ( z-lo < hi-z ) {
 	  /*
-	  cut4P(N, i);
+	  cut4P(lo, i);
 	  cut4P(i+1, z);
-	  if ( j-z < M-j ) {
+	  if ( j-z < hi-j ) {
 	    cut4P(z+1, j-1);
-	    cut4P(j, M);
+	    cut4P(j, hi);
 	    return;
 	  }
-	  cut4P(j, M);
+	  cut4P(j, hi);
 	  cut4P(z+1, j-1);
 	  */
-	  if ( j-z < M-j ) {
+	  if ( j-z < hi-j ) {
 	    // cut4P(z+1, j-1);
-	    // cut4P(j, M);
-	    addTaskSynchronized(ll, newTask(A, j, M, depthLimit, compareXY));
+	    // cut4P(j, hi);
+	    addTaskSynchronized(ll, newTask(A, j, hi, depthLimit, compareXY));
 	    addTaskSynchronized(ll, newTask(A, z+1, j-1, depthLimit, compareXY));
 	  } else {
-	    // cut4P(j, M);
+	    // cut4P(j, hi);
 	    // cut4P(z+1, j-1);
 	    addTaskSynchronized(ll, newTask(A, z+1, j-1, depthLimit, compareXY));
-	    addTaskSynchronized(ll, newTask(A, j, M, depthLimit, compareXY));
+	    addTaskSynchronized(ll, newTask(A, j, hi, depthLimit, compareXY));
 	  }
 	  addTaskSynchronized(ll, newTask(A, i+1, z, depthLimit, compareXY));
-	  // cut4Pc(N, i, depthLimit, compareXY);
+	  // cut4Pc(lo, i, depthLimit, compareXY);
 	  // return;
-	  M = i;
+	  hi = i;
 	  goto Start;
 	}
-	// M-z <= z-N
+	// hi-z <= z-lo
 	//cut4P(z+1, j-1);
-	// cut4P(j, M);
-	if ( i-N < z-i ) {
-	  // cut4P(N, i);
+	// cut4P(j, hi);
+	if ( i-lo < z-i ) {
+	  // cut4P(lo, i);
 	  // cut4P(i+1, z);
-	  addTaskSynchronized(ll, newTask(A, N, i, depthLimit, compareXY));
+	  addTaskSynchronized(ll, newTask(A, lo, i, depthLimit, compareXY));
 	  addTaskSynchronized(ll, newTask(A, i+1, z, depthLimit, compareXY));
 	} else {
 	  // cut4P(i+1, z);
-	  // cut4P(N, i);
+	  // cut4P(lo, i);
 	  addTaskSynchronized(ll, newTask(A, i+1, z, depthLimit, compareXY));
-	  addTaskSynchronized(ll, newTask(A, N, i, depthLimit, compareXY));
+	  addTaskSynchronized(ll, newTask(A, lo, i, depthLimit, compareXY));
 	}
-	addTaskSynchronized(ll, newTask(A, j, M, depthLimit, compareXY));
+	addTaskSynchronized(ll, newTask(A, j, hi, depthLimit, compareXY));
 	// cut4Pc(z+1, j-1, depthLimit, compareXY);
-	N = z+1; M = j-1;
+	lo = z+1; hi = j-1;
 	goto Start;
 } // end cut4Pc

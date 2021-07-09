@@ -2,12 +2,12 @@
 // Date: Fri Jan 31 13:32:12 2014
 // (C) OntoOO/ Dennis de Champeaux
 
-void dflgm(void **A, int N, int M, int pivotx,
+void dflgm(void **A, int lo, int hi, int pivotx,
            void (*cut)(void**, int, int, int,
                        int (*)(const void*, const void*)),
            int depthLimit, int (*compareXY)(const void*, const void*)) {
 
-  // printf("dflgm N %i M %i pivotx %i depthLimit %i\n", N,M,pivotx,depthLimit);
+  // printf("dflgm lo %i hi %i pivotx %i depthLimit %i\n", lo,hi,pivotx,depthLimit);
   /*
     Simple version of partitioning with: L/M/R
     L < pivot, M = pivot, R > pivot
@@ -18,21 +18,21 @@ void dflgm(void **A, int N, int M, int pivotx,
   register int r; // comparison output 
   // int z; // for tracing
 
-  i = N; j = M; lw = pivotx-1; up = pivotx+1;
-  int N2 = N+1;
+  i = lo; j = hi; lw = pivotx-1; up = pivotx+1;
+  int lo2 = lo+1;
     /*
       |---)-----(----)-------(----|
-      N   i     lw  up       j    M
+      lo   i     lw  up       j    hi
       
-      N <= i < lw < up < j <= M
+      lo <= i < lw < up < j <= hi
       2 <= up - lw
-      N <= x < i ==> A[x] < p3
+      lo <= x < i ==> A[x] < p3
       lw < x < up  ==> A[x] = p3
-      j < x <= M & ==> p3 < A[x] 
+      j < x <= hi & ==> p3 < A[x] 
     */
-  x = A[N]; // roving variable, the wack-a-mole item
-  p3 = A[N] = A[pivotx]; // There IS a middle value somewhere:
-  // p3 is temporarily also in A[N]; will be replaced at the end
+  x = A[lo]; // roving variable, the wack-a-mole item
+  p3 = A[lo] = A[pivotx]; // There IS a middle value somewhere:
+  // p3 is temporarily also in A[lo]; will be replaced at the end
   i++; 
   r = compareXY(x, p3);
   // if ( x < p3 ) goto L0;
@@ -44,7 +44,7 @@ void dflgm(void **A, int N, int M, int pivotx,
  L0:  
    /*
       |---)-----(----)-------(----|
-      N   i     lw  up       j    M
+      lo   i     lw  up       j    hi
       x -> L 
    */
   if ( lw < i ) { i--;
@@ -67,7 +67,7 @@ void dflgm(void **A, int N, int M, int pivotx,
  ML0: 
    /*
       |---)-----(----)-------(----|
-      N   i     lw  up       j    M
+      lo   i     lw  up       j    hi
       x -> ML 
    */
   if ( lw < i ) { i--;
@@ -89,7 +89,7 @@ void dflgm(void **A, int N, int M, int pivotx,
  R0:
    /*
       |---)-----(----)-------(----|
-      N   i     lw  up       j    M
+      lo   i     lw  up       j    hi
       x -> R
    */
   if ( j < up ) { // A[j] = p3 !
@@ -111,7 +111,7 @@ void dflgm(void **A, int N, int M, int pivotx,
   MR0:
    /*
       |---)-----(----)-------(----|
-      N   i     lw  up       j    M
+      lo   i     lw  up       j    hi
       x -> MR
    */
   if ( j < up ) { j++;
@@ -132,10 +132,10 @@ void dflgm(void **A, int N, int M, int pivotx,
   L1L: 
    /*
       |---]---------)-------(----|
-      N   i        up       j    M
+      lo   i        up       j    hi
       x -> L
    */
-  if ( j < up ) { j++; A[N] = x; 
+  if ( j < up ) { j++; A[lo] = x; 
     goto done; 
   }
   // up <= j
@@ -154,11 +154,11 @@ void dflgm(void **A, int N, int M, int pivotx,
   L1R: 
    /*
       |---]---------)-------(----|
-      N   i        up       j    M
+      lo   i        up       j    hi
       x -> R
    */
   if ( j < up ) { 
-    A[N] = A[i]; A[i--] = A[j]; A[j] = x;
+    A[lo] = A[i]; A[i--] = A[j]; A[j] = x;
     goto done; 
   }
   // up <= j
@@ -177,10 +177,10 @@ void dflgm(void **A, int N, int M, int pivotx,
  L1M: 
    /*
       |---]---------)-------(----|
-      N   i        up       j    M
+      lo   i        up       j    hi
       x -> M
    */
-  if ( j < up ) { j++; A[N] = A[i]; A[i--] = x;
+  if ( j < up ) { j++; A[lo] = A[i]; A[i--] = x;
     goto done;
   }
   // up <= j
@@ -198,16 +198,16 @@ void dflgm(void **A, int N, int M, int pivotx,
  R1R: 
    /*
       |---)---(-------------[----|
-      N   i   lw            j    M
+      lo   i   lw            j    hi
       x -> R
    */
   if ( lw < i ) {
-    if ( i == N2 ) { i = N-1; // left empty
-      A[N] = A[--j]; A[j] = x;
+    if ( i == lo2 ) { i = lo-1; // left empty
+      A[lo] = A[--j]; A[j] = x;
       goto done;      
     }
-    // N2 < i
-    A[N] = A[--i]; A[i--] = A[--j]; A[j] = x;
+    // lo2 < i
+    A[lo] = A[--i]; A[i--] = A[--j]; A[j] = x;
     goto done;
   }
   // i <= lw
@@ -225,11 +225,11 @@ void dflgm(void **A, int N, int M, int pivotx,
  R1L: 
    /*
       |---)---(-------------[----|
-      N   i   lw            j    M
+      lo   i   lw            j    hi
       x -> L
    */
   if ( lw < i ) {
-    A[N] = x; i--;
+    A[lo] = x; i--;
     goto done;
   }
   // i <= lw
@@ -247,16 +247,16 @@ void dflgm(void **A, int N, int M, int pivotx,
  R1M: 
    /*
       |---)---(-------------[----|
-      N   i   lw            j    M
+      lo   i   lw            j    hi
       x -> M
    */
   if ( lw < i ) {
-    if ( i == N2 ) { i = N-1; // left empty
-      A[N] = x;
+    if ( i == lo2 ) { i = lo-1; // left empty
+      A[lo] = x;
        goto done;      
     }
-    // N2 < i
-    A[N] = A[--i]; A[i--] = x;
+    // lo2 < i
+    A[lo] = A[--i]; A[i--] = x;
     goto done;
   }
   // i <= lw
@@ -274,36 +274,36 @@ void dflgm(void **A, int N, int M, int pivotx,
  done: 
     /*
       |---]---------[---------|
-      N   i         j         M
+      lo   i         j         hi
     */
     /*
-      for ( z = N; z <= i; z++ )
+      for ( z = lo; z <= i; z++ )
 	// if ( p3 <= A[z] ) {
 	if ( compareXY(p3, A[z]) <= 0 ) {
 	  printf("doneL z %i\n", z);
-	  printf("N %i i %i lw %i up %i j %i M %i\n", N,i,lw,up,j,M);
+	  printf("lo %i i %i lw %i up %i j %i hi %i\n", lo,i,lw,up,j,hi);
 	  exit(0);
 	}
       for ( z = i+1; z < j; z++ )
 	// if ( p3 != A[z] ) {
 	if ( compareXY(p3, A[z]) != 0 ) {
 	  printf("doneM z %i\n", z);
-	  printf("N %i i %i lw %i up %i j %i M %i\n", N,i,lw,up,j,M);
+	  printf("lo %i i %i lw %i up %i j %i hi %i\n", lo,i,lw,up,j,hi);
 	  exit(0);
 	}
-      for ( z = j; z <= M ; z++ )
+      for ( z = j; z <= hi ; z++ )
 	// if ( A[z] <= p3 ) {
 	if ( compareXY(A[z], p3) <= 0 ) {
 	  printf("doneR z %i\n", z);
-	  printf("N %i i %i lw %i up %i j %i M %i\n", N,i,lw,up,j,M);
+	  printf("lo %i i %i lw %i up %i j %i hi %i\n", lo,i,lw,up,j,hi);
 	  exit(0);
 	}
       */
-    if ( i - N  < M - j ) {
-      if ( N < i ) (*cut)(A, N, i, depthLimit, compareXY);
-      if ( j < M ) (*cut)(A, j, M, depthLimit, compareXY);
+    if ( i - lo  < hi - j ) {
+      if ( lo < i ) (*cut)(A, lo, i, depthLimit, compareXY);
+      if ( j < hi ) (*cut)(A, j, hi, depthLimit, compareXY);
       return;
     }
-    if ( j < M ) (*cut)(A, j, M, depthLimit, compareXY);
-    if ( N < i ) (*cut)(A, N, i, depthLimit, compareXY);
+    if ( j < hi ) (*cut)(A, j, hi, depthLimit, compareXY);
+    if ( lo < i ) (*cut)(A, lo, i, depthLimit, compareXY);
 } // end dflgm
