@@ -22,7 +22,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
   int lo2 = lo+1;
     /*
       |---)-----(----)-------(----|
-      lo   i     lw  up       j    hi
+     lo   i     lw  up       j    hi
       
       lo <= i < lw < up < j <= hi
       2 <= up - lw
@@ -44,7 +44,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
  L0:  
    /*
       |---)-----(----)-------(----|
-      lo   i     lw  up       j    hi
+     lo   i     lw  up       j    hi
       x -> L 
    */
   if ( lw < i ) { i--;
@@ -67,7 +67,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
  ML0: 
    /*
       |---)-----(----)-------(----|
-      lo   i     lw  up       j    hi
+     lo   i     lw  up       j    hi
       x -> ML 
    */
   if ( lw < i ) { i--;
@@ -89,7 +89,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
  R0:
    /*
       |---)-----(----)-------(----|
-      lo   i     lw  up       j    hi
+     lo   i     lw  up       j    hi
       x -> R
    */
   if ( j < up ) { // A[j] = p3 !
@@ -111,7 +111,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
   MR0:
    /*
       |---)-----(----)-------(----|
-      lo   i     lw  up       j    hi
+     lo   i     lw  up       j    hi
       x -> MR
    */
   if ( j < up ) { j++;
@@ -132,7 +132,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
   L1L: 
    /*
       |---]---------)-------(----|
-      lo   i        up       j    hi
+     lo   i        up       j    hi
       x -> L
    */
   if ( j < up ) { j++; A[lo] = x; 
@@ -154,7 +154,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
   L1R: 
    /*
       |---]---------)-------(----|
-      lo   i        up       j    hi
+     lo   i        up       j    hi
       x -> R
    */
   if ( j < up ) { 
@@ -177,7 +177,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
  L1M: 
    /*
       |---]---------)-------(----|
-      lo   i        up       j    hi
+     lo   i        up       j    hi
       x -> M
    */
   if ( j < up ) { j++; A[lo] = A[i]; A[i--] = x;
@@ -198,7 +198,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
  R1R: 
    /*
       |---)---(-------------[----|
-      lo   i   lw            j    hi
+     lo   i   lw            j    hi
       x -> R
    */
   if ( lw < i ) {
@@ -225,7 +225,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
  R1L: 
    /*
       |---)---(-------------[----|
-      lo   i   lw            j    hi
+     lo   i   lw            j    hi
       x -> L
    */
   if ( lw < i ) {
@@ -247,7 +247,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
  R1M: 
    /*
       |---)---(-------------[----|
-      lo   i   lw            j    hi
+     lo   i   lw            j    hi
       x -> M
    */
   if ( lw < i ) {
@@ -274,7 +274,7 @@ void dflgm(void **A, int lo, int hi, int pivotx,
  done: 
     /*
       |---]---------[---------|
-      lo   i         j         hi
+     lo   i         j         hi
     */
     /*
       for ( z = lo; z <= i; z++ )
