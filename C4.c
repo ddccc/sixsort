@@ -90,7 +90,7 @@ void cut4c(void **A, int lo, int hi, int depthLimit, int (*compareXY)())
   */
 { // small <= L, use a variable number for sampling
   // int probeLng = sqrt(L/5.8); 
-int probeLng = sqrt(L/5.6); 
+    int probeLng = sqrt(L/5.6); 
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
     lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
