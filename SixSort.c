@@ -34,7 +34,7 @@ IN CONNECTION WITH THE SOFTWARE OR DOCUMENTATION OR THE USE OF OR
 OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 */
 
-// File: c:/bsd/rigel/sort/SixSort.c
+// File: c:/bsd/rigel/sort/sixsortSixSort.c
 // Date: Thu Jan 07 15:08:48 2010
 /* This file has the source of the algorithms that make up SixSort
    headed by sixsort
