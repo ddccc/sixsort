@@ -10,10 +10,10 @@
 #include "Dsort.c"
 #include "Isort.c"
 */
-void mergeSort2c();
-void merge2();
-void checkMS2();
-const int mergeLimit = 150;
+static void mergeSort2c();
+static void merge2();
+static void checkMS2();
+static const int mergeLimit = 150;
 const int iLimit = 9;
 
 void mergeSortm(void **A, int N, int M, int (*compare)()) {

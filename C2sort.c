@@ -6,10 +6,10 @@
 
 // This version combines isort + dflgm + ( pivot sample + (fast loops | dflgm ) )
 
-const int dflgmLimit2 = 250;
-const int iLimit2 = 9;
+static const int dflgmLimit2 = 250;
+static const int iLimit2 = 9;
 
-void cut2c();
+void cut2c(); // is called also
 // cut2 is used as a best in class quicksort implementation 
 // with a defense against quadratic behavior due to duplicates
 // cut2 is a support function to call up the workhorse cut2c
@@ -20,7 +20,7 @@ void cut2(void **A, int lo, int hi, int (*compare)()) {
   cut2c(A, lo, hi, depthLimit, compare);
 } // end cut2
 // calculate the median of 3
-int medq2(void **A, int a, int b, int c,
+static int medq2(void **A, int a, int b, int c,
 	int (*compareXY ) (const void *, const void * ) ) {
   return
     compareXY( A[a], A[b] ) < 0 ?

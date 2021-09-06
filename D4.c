@@ -5,18 +5,18 @@
 // d4 is a quicksort to be applied only on small arrays; the generated partitions
 // or not ordered for recursive processing; the right one is handled by tail iteration.
 
-/* 
+
 // calculate the median of 3
-int med(void **A, int a, int b, int c,
+static int med4(void **A, int a, int b, int c,
 	int (*compareXY ) (const void *, const void * ) ) {
   return
     compareXY( A[a], A[b] ) < 0 ?
     ( compareXY( A[b], A[c] ) < 0 ? b : compareXY( A[a], A[c] ) < 0 ? c : a)
     : compareXY( A[b], A[c] ) > 0 ? b : compareXY( A[a], A[c] ) > 0 ? c : a;
-} // end med
-// */
+} // end med4
 
-void d4c(void **, int, int, int, int (*)(const void*, const void*));
+
+static void d4c(void **, int, int, int, int (*)(const void*, const void*));
 
 void d4(void **A, int N, int M, int (*compare)(const void*, const void*)) {
   //  printf("d4 N %i M %i L %i\n", N, M, M-N);
@@ -24,7 +24,7 @@ void d4(void **A, int N, int M, int (*compare)(const void*, const void*)) {
   if ( L <= 0 ) return;
   int depthLimit = 2.9 * floor(log(L));
   d4c(A, N, M, depthLimit, compare);
-} // end d3
+} // end d4
 
 void d4c(void **A, int N, int M, int depthLimit, int (*compare)(const void*, const void*)) {
   while ( N < M ) {
@@ -47,11 +47,11 @@ void d4c(void **A, int N, int M, int depthLimit, int (*compare)(const void*, con
 	int pm = M;
 	if ( 51 < L ) {
 	  int d = (L-2)>>3; // L/8;
-	  pn = med(A, pn, pn + d, pn + 2 * d, compare);
-	  p0 = med(A, p0 - d, p0, p0 + d, compare);
-	  pm = med(A, pm - 2 * d, pm - d, pm, compare);
+	  pn = med4(A, pn, pn + d, pn + 2 * d, compare);
+	  p0 = med4(A, p0 - d, p0, p0 + d, compare);
+	  pm = med4(A, pm - 2 * d, pm - d, pm, compare);
 	}
-	p0 = med(A, pn, p0, pm, compare);
+	p0 = med4(A, pn, p0, pm, compare);
 	// }
       if ( p0 != N ) iswap(p0, N, A);
     }

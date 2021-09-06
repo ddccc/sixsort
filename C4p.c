@@ -2,9 +2,9 @@
 // Date: Sun Oct 20 14:51:33 2019
 // (C) Dennis de Champeaux/ OntoOO
 
-int cut4Limit4 = 500; // transition to 1-pivot
+static int cut4Limit4 = 500; // transition to 1-pivot
 
-void cut4Pc();
+static void cut4Pc();
 // cut4P is doing 4-partitioning using 3 pivots
 void cut4P(void **A, int lo, int hi, int (*compare)()) {
   // printf("cut4P %d %d \n", lo, hi);

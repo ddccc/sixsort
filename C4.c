@@ -2,10 +2,10 @@
 // Date: Thu Jan 26 14:34:54 2017
 // (C) OntoOO/ Dennis de Champeaux
 
-const int cut4Limit = 500; // 1-pivot prefix bound
+static const int cut4Limit = 500; // 1-pivot prefix bound
 // const int cut4Limit = 1200; // 1-pivot prefix bound
 
-void cut4c();
+static void cut4c();
 // cut4 is doing 4-partitioning using 3 pivots
 void cut4(void **A, int lo, int hi, int (*compareXY)()) {
   // printf("cut4 %d %d \n", lo, hi);

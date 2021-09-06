@@ -58,7 +58,7 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include <math.h>
 
 
-char* expiration = "*** License for sixsort has expired ...\n";
+static char* expiration = "*** License for sixsort has expired ...\n";
 
 // Here more global entities used throughout
 // int (*compareXY)();

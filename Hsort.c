@@ -14,7 +14,7 @@ void iswap(int p, int q, void **A) {
 
 // #include "Isort.c" // insertionsort member
 
-void heapSort(void **, int, int (*)(const void*, const void*));
+static void heapSort(void **, int, int (*)(const void*, const void*));
 static void heapify(void **, int, int (*)(const void*, const void*));
 static void siftDown(void **, int, int, int (*)(const void*, const void*));
 

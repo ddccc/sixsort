@@ -63,13 +63,13 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
   fprintf(stderr,"%s: %s\n",(str),strerror(code)); \
   exit(1);
 
-char* expiration = "*** License for sixsort has expired ...\n";
+static char* expiration = "*** License for sixsort has expired ...\n";
 
 // Here more global entities used throughout
 // int (*compareXY)();
 // void **A;
-int sleepingThreads = 0;
-int NUMTHREADS;
+static int sleepingThreads = 0;
+static int NUMTHREADS;
 
 struct stack *ll;
 struct task *newTask();

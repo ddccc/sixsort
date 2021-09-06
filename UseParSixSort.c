@@ -76,7 +76,7 @@ OTHER DEALINGS WITH THE SOFTWARE OR DOCUMENTATION.
 #include "Dsort.c"
 #include "Isort.c"
 #include "Qusort.c"
-*/
+// */
 
 #define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
 void heapc();
@@ -89,7 +89,7 @@ void dflgm();
   exit(1);
 
 
-int NUMTHREADS = 2;
+static int NUMTHREADS = 2;
 
 // Example of objects that can be used to populate an array to be sorted:
   // To obtain the int field from X: ((struct intval *) X)->val
@@ -111,12 +111,12 @@ int compareIntVal (const void *a, const void *b)
 
 // To avoid compiler warnings::
 void callHeapsort(void **A, int size, int (*compar)() );
-void heapc(void **A, int N, int M, int (*compar)());
-void heapSort(void **A, int size, int (*compar)());
+// void heapc(void **A, int N, int M, int (*compar)());
+// void heapSort(void **A, int size, int (*compar)());
 void quicksort0(void **A, int N, int M, int (*compar)());
 void quicksort0c(void **A, int N, int M, int depthLimit, int (*compar)());
 // void cut2c(void **A, int N, int M, int depthLimit, int (*compar)());
-void dflgm(void **A, int N, int M, int pivotx, void (*cut)(), int depthLimit, int (*compar)());
+// void dflgm(void **A, int N, int M, int pivotx, void (*cut)(), int depthLimit, int (*compar)());
 void sixsort(void **AA, int size, 
 	int (*compar ) (const void *, const void * ),
 	int numberOfThreads);
@@ -1039,7 +1039,8 @@ void shuffle(void **A, int n, int m, int tweak, int seed) {
 
 void callHeapsort(void **A, int size, 
 	 int (*compar ) (const void *, const void * ) ) {
-  heapSort(A, size, compar);
+  // heapSort(A, size, compar);
+  heapc(A, 0, size-1, compar);
 } // end callHeapsort
 
 void validateParSixSortBT() {

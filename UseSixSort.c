@@ -100,7 +100,7 @@ void cut2(void **A, int N, int M, int (*compar )());
 void cut4(void **A, int N, int M, int (*compar )());
 void sixsort(void **A, int size, 
 	      int (*compar ) (const void *, const void * ));
-void heapSort(void **a, int count, int (*compar )());
+// void heapSort(void **a, int count, int (*compar )());
 void part3();
 void testBentley();
 void testQsort();
@@ -364,7 +364,8 @@ void validateXYZ() {
 
 void callHeapsort(void **A, int size, 
 	 int (*compar ) (const void *, const void * ) ) {
-  heapSort(A, size, compar);
+  // heapSort(A, size, compar);
+  heapc(A, 0, size-1, compar);
 } // end callHeapsort
 
 void validateHeapSort() {
