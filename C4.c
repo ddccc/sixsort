@@ -1,5 +1,5 @@
 // File: c:/bsd/rigel/sort/C7/C4.c
-// Date: Thu Jan 26 14:34:54 2017
+// Date: Thu Jan 26 14:34:54 2017 Thu Jul 14 16:11:06 2022
 // (C) OntoOO/ Dennis de Champeaux
 
 static const int cut4Limit = 500; // 1-pivot prefix bound
@@ -90,7 +90,8 @@ void cut4c(void **A, int lo, int hi, int depthLimit, int (*compareXY)())
   */
 { // small <= L, use a variable number for sampling
   // int probeLng = sqrt(L/5.8); 
-    int probeLng = sqrt(L/5.6); 
+  // int probeLng = sqrt(L/5.6); 
+    int probeLng = sqrt(L/3.0); 
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     int quartSegmentLng = probeLng >> 2; // probeLng/4;
     lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;

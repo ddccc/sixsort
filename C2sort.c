@@ -1,6 +1,6 @@
 // c:/bsd/rigel/sort/C2sort.c
 // Date: Fri Jan 31 13:32:12 2014, 2017 Sun Mar 03 16:14:28 2019 
-// Mon Jan 04 10:43:49 2021, Sun May 30 14:48:25 2021
+// Mon Jan 04 10:43:49 2021, Sun May 30 14:48:25 2021 Thu Jul 14 16:05:59 2022
 // (C) OntoOO/ Dennis de Champeaux
 
 
@@ -75,7 +75,7 @@ void cut2c(void **A, int lo, int hi, int depthLimit,
     int middlex = lo + (L>>1); // lo + L/2
     void *middle;
     int k, lo1, hi1; // for sampling
-    int probeLng = sqrt(L/7.0); if ( probeLng < 9 ) probeLng = 9;
+    int probeLng = sqrt(L/6.0); if ( probeLng < 9 ) probeLng = 9;
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
     hi1 = lo1 + probeLng - 1;
