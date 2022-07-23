@@ -1,5 +1,5 @@
 // c:/bsd/rigel/sort/C2sort.c
-// Date: Fri Jan 31 13:32:12 2014, 2017 Sun Mar 03 16:14:28 2019 
+// Date: Fri Jan 31 13:32:12 2014, 2017 Sun Mar 03 16:14:28 2019, Sat Jul 23 13:05:48 2022
 // Mon Jan 04 10:43:49 2021, Sun May 30 14:48:25 2021 Thu Jul 14 16:05:59 2022
 // (C) OntoOO/ Dennis de Champeaux
 
@@ -95,7 +95,7 @@ void cut2c(void **A, int lo, int hi, int depthLimit,
       return;
     }
     for ( k = lo1; k <= middlex; k++ ) {
-    iswap(k, I, A); I++;
+      iswap(k, I, A); I++;
     }
     I--;
     for ( k = hi1; middlex < k; k--) {

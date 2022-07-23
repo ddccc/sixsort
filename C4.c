@@ -1,9 +1,10 @@
-// File: c:/bsd/rigel/sort/C7/C4.c
-// Date: Thu Jan 26 14:34:54 2017 Thu Jul 14 16:11:06 2022
+// File: c:/bsd/rigel/sort/C4.c
+// Date: 2012 // Sat Jul 23 08:17:35 2022
 // (C) OntoOO/ Dennis de Champeaux
 
-static const int cut4Limit = 500; // 1-pivot prefix bound
-// const int cut4Limit = 1200; // 1-pivot prefix bound
+// static const int cut4Limit = 500; // 1-pivot prefix bound
+static const int cut4Limit = 1024*200; // 1-pivot prefix bound
+
 
 static void cut4c();
 // cut4 is doing 4-partitioning using 3 pivots
@@ -30,38 +31,29 @@ void cut4c(void **A, int lo, int hi, int depthLimit, int (*compareXY)())
 
   // printf("cut4c %d %d \n", lo, hi);
   L = hi - lo +1; 
-  //  if ( L < 1024 * 256 ) {
-  if ( L < 1024 * 200 ) {
+  //  if ( L < 1024 * 200 ) {
+  if ( L < cut4Limit ) {
     cut2lr(A, lo, hi, compareXY);
     return;
   }
-  /*
-  if ( L <= 1 ) return;
-  // alternative prefix
-  if ( L < cut4Limit ) {
-    // cut2c(A, lo, hi, depthLimit, compareXY);  // alternative
-    // quicksort0c(A, lo, hi, depthLimit, compareXY); 
-    d4c(A, lo, hi, depthLimit, compareXY); 
-    return; 
-    }
-  */
+ 
   if ( depthLimit <= 0 ) {
     heapc(A, lo, hi, compareXY);
     return;
   }
   depthLimit--;
 
-
-
   int k, lo1, hi1; // for sampling
-  int maxlx, middlex, mrx, minrx;  
+  int maxlx, middlex, minrx;  
   // pivots for left/ middle / right regions
   register void *maxl, *middle, *minr;   
   register int i, j, lw, up, z; // indices
   i = lo; j = hi;
   z = middlex = lo + (L>>1); // lo + L/2/
-  const int small = 900; 
   /*
+          Obsolete because of the size of cut4Limit
+  // const int small = 900; 
+
   // const int small = 4000; 
   if ( L < small ) { // use 5 elements for sampling
     int e1, e2, e3, e4, e5;
@@ -88,41 +80,40 @@ void cut4c(void **A, int lo, int hi, int depthLimit, int (*compareXY)())
     lw = z-1; up = mrx+1;
   } else 
   */
-{ // small <= L, use a variable number for sampling
-  // int probeLng = sqrt(L/5.8); 
-  // int probeLng = sqrt(L/5.6); 
-    int probeLng = sqrt(L/3.0); 
-    int halfSegmentLng = probeLng >> 1; // probeLng/2;
-    int quartSegmentLng = probeLng >> 2; // probeLng/4;
-    lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
-    hi1 = lo1 + probeLng - 1;
-    maxlx = lo1 + quartSegmentLng;
-    // int middlex = lo1 + halfSegmentLng;
-    minrx = hi1 - quartSegmentLng;
-    mrx = middlex + (quartSegmentLng>>1);
-    int offset = L/probeLng;  
+    { // small <= L, use a variable number for sampling
+      // int probeLng = sqrt(L/5.8); 
+      // int probeLng = sqrt(L/5.6); 
+      int probeLng = sqrt(L/3.0); 
+      int halfSegmentLng = probeLng >> 1; // probeLng/2;
+      int quartSegmentLng = probeLng >> 2; // probeLng/4;
+      lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
+      hi1 = lo1 + probeLng - 1;
+      maxlx = lo1 + quartSegmentLng;
+      // int middlex = lo1 + halfSegmentLng;
+      minrx = hi1 - quartSegmentLng;
+      int offset = L/probeLng;  
 
-    // assemble the mini array [lo1, hi1]
-    for (k = 0; k < probeLng; k++) // iswap(lo1 + k, lo + k * offset, A);
-    { int xx = lo1 + k, yy = lo + k * offset; iswap(xx, yy, A); }
-    // sort this mini array to obtain good pivots
-    cut4c(A, lo1, hi1, depthLimit, compareXY);
-    lw = maxlx; up = minrx;
-  }
+      // assemble the mini array [lo1, hi1]
+      for (k = 0; k < probeLng; k++) // iswap(lo1 + k, lo + k * offset, A);
+	{ int xx = lo1 + k, yy = lo + k * offset; iswap(xx, yy, A); }
+      // sort this mini array to obtain good pivots
+      cut4c(A, lo1, hi1, depthLimit, compareXY);
+      lw = maxlx; up = minrx;
+    }
 
   // pivots
   maxl = A[maxlx]; middle = A[z]; minr = A[minrx];
 
   // check that segments can be properly initialized
   if ( compareXY(maxl, middle) == 0 || 
-       compareXY(middle, A[mrx]) == 0 || 
-       compareXY(A[mrx], minr) == 0 ) {
+       compareXY(middle, minr) == 0 || 
+       compareXY(minr, A[hi1]) == 0 ) {
     // no good pivots available, thus escape
     dflgm(A, lo, hi, middlex, cut4c, depthLimit, compareXY);
     return;
   }
 
-  if ( small  <= L) {
+    //  if ( small  <= L) {
     // Swap these two segments to the corners
     for ( k = lo1; k <= maxlx; k++ ) {
       iswap(k, i, A); i++;
@@ -132,7 +123,7 @@ void cut4c(void **A, int lo, int hi, int depthLimit, int (*compareXY)())
       iswap(k, j, A); j--;
     }
     j++;
-  } 
+    //  } 
 
   // get moving
 
