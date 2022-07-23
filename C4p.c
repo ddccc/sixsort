@@ -90,7 +90,7 @@ void cut4Pc(void **A, int lo, int hi, int depthLimit, int (*compareXY)())
     { int xx = lo1 + k, yy = lo + k * offset; iswap(xx, yy, A); }
     cut2c(A, lo1, hi1, depthLimit, compareXY);
     lw = maxlx; up = minrx;
-  }
+    // }
 
   // pivots
   maxl = A[maxlx]; middle = A[z]; minr = A[minrx];
