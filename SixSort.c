@@ -71,7 +71,8 @@ static char* expiration = "*** License for sixsort has expired ...\n";
 // */
 #include "Qusortm.c"
 #include "D3sort.c" // dflgm3
-#include "C2sort.c" 
+// #include "C2sort.c" 
+#include "C2k1.c" 
 #include "C2LR.c"
 
 // #include "D4.c"

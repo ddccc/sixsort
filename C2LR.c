@@ -14,7 +14,8 @@ void cut2lr(void **A, int lo, int hi, int (*compare)()) {
   if ( L < cut2LRLimit ) { 
     // dflgm3(A, lo, hi, depthLimit, compare);
     // quicksortmc(A, lo, hi, depthLimit, compare);
-    cut2c(A, lo, hi, depthLimit, compare);
+    // cut2c(A, lo, hi, depthLimit, compare);
+    cut2k1c(A, lo, hi, depthLimit, compare);
     return;
   }
   cut2lrc(A, lo, hi, depthLimit, compare);
@@ -41,7 +42,8 @@ void cut2lrc1(void **A, int lo, int hi, int bufl[], int bufr[],
   if ( L < cut2LRLimit ) { 
     // dflgm3(A, lo, hi, depthLimit, compareXY);
     // quicksortmc(A, lo, hi, depthLimit, compareXY);
-    cut2c(A, lo, hi, depthLimit, compareXY);
+    // cut2c(A, lo, hi, depthLimit, compareXY);
+    cut2k1c(A, lo, hi, depthLimit, compareXY);
     return;
   }
 

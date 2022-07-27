@@ -72,6 +72,7 @@ void heapc();
 void insertionsort();
 void dflgm();
 #include "Qusort.c"
+#include "C2sort.c"
 
 // To avoid compiler warnings:::
 void callQuicksort0(void **AA, int size, int (*compar )());
