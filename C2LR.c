@@ -15,7 +15,7 @@ void cut2lr(void **A, int lo, int hi, int (*compare)()) {
     // dflgm3(A, lo, hi, depthLimit, compare);
     // quicksortmc(A, lo, hi, depthLimit, compare);
     // cut2c(A, lo, hi, depthLimit, compare);
-    cut2k1c(A, lo, hi, depthLimit, compare);
+    cut2k2c(A, lo, hi, depthLimit, compare);
     return;
   }
   cut2lrc(A, lo, hi, depthLimit, compare);
@@ -43,7 +43,7 @@ void cut2lrc1(void **A, int lo, int hi, int bufl[], int bufr[],
     // dflgm3(A, lo, hi, depthLimit, compareXY);
     // quicksortmc(A, lo, hi, depthLimit, compareXY);
     // cut2c(A, lo, hi, depthLimit, compareXY);
-    cut2k1c(A, lo, hi, depthLimit, compareXY);
+    cut2k2c(A, lo, hi, depthLimit, compareXY);
     return;
   }
 
@@ -58,7 +58,8 @@ void cut2lrc1(void **A, int lo, int hi, int bufl[], int bufr[],
   int middlex = lo + (L>>1); // lo + L/2
   void *middle;
   int k, lo1, hi1; // for sampling
-    int probeLng = sqrt(L/7.0); if ( probeLng < 9 ) probeLng = 9;
+  int probeLng = sqrt(L/7.0); if ( probeLng < 9 ) probeLng = 9;
+  // int probeLng = 9;
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
     hi1 = lo1 + probeLng - 1;

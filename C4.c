@@ -12,7 +12,8 @@ void cut4(void **A, int lo, int hi, int (*compareXY)()) {
   // printf("cut4 %d %d \n", lo, hi);
   int L = hi - lo; 
   if ( L < cut4Limit ) {
-    cut2lr(A, lo, hi, compareXY); 
+    cut2k2(A, lo, hi, compareXY);
+    // cut2lr(A, lo, hi, compareXY);
     // cut2(A, lo, hi, compareXY); 
     // quicksort0(A, lo, hi, compareXY);
     // heapc(A, lo, hi, compareXY); 
@@ -34,7 +35,8 @@ void cut4c(void **A, int lo, int hi, int depthLimit, int (*compareXY)())
   L = hi - lo +1; 
   //  if ( L < 1024 * 200 ) {
   if ( L < cut4Limit ) {
-    cut2lr(A, lo, hi, compareXY);
+    cut2k2c(A, lo, hi, depthLimit, compareXY);
+    // cut2lr(A, lo, hi, depthLimit, compareXY);
     return;
   }
  

@@ -75,7 +75,7 @@ void cut2c(void **A, int lo, int hi, int depthLimit,
     int middlex = lo + (L>>1); // lo + L/2
     void *middle;
     int k, lo1, hi1; // for sampling
-    int probeLng = sqrt(L/6.0); if ( probeLng < 9 ) probeLng = 9;
+    int probeLng = sqrt(L/7.0); if ( probeLng < 9 ) probeLng = 9;
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
     hi1 = lo1 + probeLng - 1;

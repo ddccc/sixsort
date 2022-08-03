@@ -68,7 +68,7 @@ void cut2k1c(void **A, int lo, int hi, int depthLimit,
     register int I = lo, J = hi; // indices
     int middlex = lo + (L>>1); // lo + L/2
     int k, lo1, hi1; // for sampling
-    int probeLng = sqrt(L/3.0); // 2/3 ?
+    int probeLng = sqrt(L/7.0); // 2/3 ?
     // int probeLng = sqrt(L/6.5); // - - 
     // int probeLng = sqrt(L/6.0); // 0.99 no good
     if ( probeLng < 9 ) probeLng = 9;
