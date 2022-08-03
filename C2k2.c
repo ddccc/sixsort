@@ -6,12 +6,12 @@
 // This version combines isort + dflgm + ( pivot sample + (fast loops | dflgm ) )
 
 static const int dflgmLimit6 = 250;
-static const int iLimit6 = 9;
+// static const int iLimit6 = 9;
 
 void cut2k2c(); // is called also
-// cut2k is used as a best in class quicksort implementation 
+// cut2k2 is used as a best in class quicksort implementation 
 // with a defense against quadratic behavior due to duplicates
-// cut2k is a support function to call up the workhorse cut2kc
+// cut2k2 is a support function to call up the workhorse cut2k2c
 void cut2k2(void **A, int lo, int hi, int (*compare)()) { 
   // printf("cut2k %d %d %d\n", lo, hi, hi-lo);
   int L = hi - lo;
@@ -19,6 +19,7 @@ void cut2k2(void **A, int lo, int hi, int (*compare)()) {
   cut2k2c(A, lo, hi, depthLimit, compare);
 } // end cut2k
 
+/*
 // calculate the median of 3
 static int medq6(void **A, int a, int b, int c,
 	int (*compareXY ) (const void *, const void * ) ) {
@@ -27,27 +28,30 @@ static int medq6(void **A, int a, int b, int c,
     ( compareXY( A[b], A[c] ) < 0 ? b : compareXY( A[a], A[c] ) < 0 ? c : a)
     : compareXY( A[b], A[c] ) > 0 ? b : compareXY( A[a], A[c] ) > 0 ? c : a;
 } // end medq5
+*/
 
-// int partitionx();
 void cut2k2c(void **A, int lo, int hi, int depthLimit, 
 		 int (*compareXY)(const void*, const void*)) {
   // Unlike other quicksort designs, this one has only ONE
-  // right moving loop.  
+  // right moving loop at the left side that creates a partition 
+  // at the left half.  Ditto at the right side.
   // It identifies elements that belong at the left side and swaps them 
-  // to the front of the array. The other segments creeps to right.
+  // to the front of the array. The other segments creeps to the right.
   // The trick is a very tight single loop and locality.
+  // This produces a layout: LRLR. The two inner once are swapped.
+
   // printf("Enter cut2k2c lo: %d hi: %d %d\n", lo, hi, depthLimit);
   // printf(" gap %d \n", hi-lo);
 
   while ( lo < hi ) {
-    // printf("while cut2kc lo: %d hi: %d %d \n", lo, hi, depthLimit);
+    // printf("while cut2k2c lo: %d hi: %d %d \n", lo, hi, depthLimit);
     int L = hi - lo;
     // printf("L %i \n", L);
+    /*
     if ( L <= iLimit6) {
       insertionsort(A, lo, hi, compareXY);
       return;
     }
-  
     if ( L < dflgmLimit6 ) {
       int p0 = lo + (L>>1); // lo + L/2;
       if ( 7 < L ) {
@@ -63,6 +67,11 @@ void cut2k2c(void **A, int lo, int hi, int depthLimit,
 	p0 = medq6(A, pn, p0, pm, compareXY);
       }
       dflgm(A, lo, hi, p0, cut2k2c, depthLimit, compareXY);
+      return;
+    }
+    */
+    if ( L < dflgmLimit6 ) {
+      dflgm3(A, lo, hi, depthLimit, compareXY);
       return;
     }
     if ( depthLimit <= 0 ) {
@@ -101,7 +110,7 @@ void cut2k2c(void **A, int lo, int hi, int depthLimit,
     }
     // move the sample to the corners
     for ( k = lo1; k <= middlex; k++ ) {
-    iswap(k, I, A); I++;
+      iswap(k, I, A); I++;
     }
     I--;
     for ( k = hi1; middlex < k; k--) {
@@ -178,5 +187,5 @@ void cut2k2c(void **A, int lo, int hi, int depthLimit,
       hi = J;
     }
   } // end while
-} // (*  OF cut2k; *) the brackets remind that this was once, 1985, Pascal code
+} // (*  OF cut2k2; *) the brackets remind that this was once, 1985, Pascal code
 

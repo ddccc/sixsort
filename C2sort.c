@@ -7,7 +7,7 @@
 // This version combines isort + dflgm + ( pivot sample + (fast loops | dflgm ) )
 
 static const int dflgmLimit2 = 250;
-static const int iLimit2 = 9;
+// static const int iLimit2 = 9;
 
 void cut2c(); // is called also
 // cut2 is used as a best in class quicksort implementation 
@@ -19,6 +19,7 @@ void cut2(void **A, int lo, int hi, int (*compare)()) {
   int depthLimit = 2.9 * floor(log(L));
   cut2c(A, lo, hi, depthLimit, compare);
 } // end cut2
+/*
 // calculate the median of 3
 static int medq2(void **A, int a, int b, int c,
 	int (*compareXY ) (const void *, const void * ) ) {
@@ -27,7 +28,7 @@ static int medq2(void **A, int a, int b, int c,
     ( compareXY( A[b], A[c] ) < 0 ? b : compareXY( A[a], A[c] ) < 0 ? c : a)
     : compareXY( A[b], A[c] ) > 0 ? b : compareXY( A[a], A[c] ) > 0 ? c : a;
 } // end medq2
-
+*/
 void cut2c(void **A, int lo, int hi, int depthLimit, 
 		 int (*compareXY)(const void*, const void*)) {
   // printf("Enter cut2c lo: %d hi: %d %d\n", lo, hi, depthLimit);
@@ -36,12 +37,12 @@ void cut2c(void **A, int lo, int hi, int depthLimit,
   while ( lo < hi ) {
     // printf("cut2c lo: %d hi %d  L %i\n", lo, hi, hi-lo);
     int L = hi - lo;
-    /*
-    if ( L <= iLimit2) {
+
+    if ( L <= dflgmLimit2 ) {
       dflgm3(A, lo, hi, depthLimit, compareXY);
       return;
     }
-    */
+    /*
     if ( L <= iLimit2) {
       insertionsort(A, lo, hi, compareXY);
       return;
@@ -64,6 +65,7 @@ void cut2c(void **A, int lo, int hi, int depthLimit,
       dflgm(A, lo, hi, p0, cut2c, depthLimit, compareXY);
       return;
     }
+    */
     if ( depthLimit <= 0 ) {
       heapc(A, lo, hi, compareXY);
       return;
@@ -76,6 +78,7 @@ void cut2c(void **A, int lo, int hi, int depthLimit,
     void *middle;
     int k, lo1, hi1; // for sampling
     int probeLng = sqrt(L/7.0); if ( probeLng < 9 ) probeLng = 9;
+    // int probeLng = 9;
     int halfSegmentLng = probeLng >> 1; // probeLng/2;
     lo1 = middlex - halfSegmentLng; //  lo + (L>>1) - halfSegmentLng;
     hi1 = lo1 + probeLng - 1;

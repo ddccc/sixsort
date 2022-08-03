@@ -2,7 +2,7 @@
 // Date: Wed Jun 10 15:37:30 2020, Fri May 28 21:24:28 2021
 // (C) OntoOO/ Dennis de Champeaux
 
-static const int cut2LRLimit =  700; 
+static const int cut2LRLimit =  250; 
 static const int bufSize = 200;
 
 #define iswap(p, q, A) { void *t3t = A[p]; A[p] = A[q]; A[q] = t3t; }
@@ -15,7 +15,7 @@ void cut2lr(void **A, int lo, int hi, int (*compare)()) {
     // dflgm3(A, lo, hi, depthLimit, compare);
     // quicksortmc(A, lo, hi, depthLimit, compare);
     // cut2c(A, lo, hi, depthLimit, compare);
-    cut2k2c(A, lo, hi, depthLimit, compare);
+    cut2lrc(A, lo, hi, depthLimit, compare);
     return;
   }
   cut2lrc(A, lo, hi, depthLimit, compare);
