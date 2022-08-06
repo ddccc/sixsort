@@ -2,9 +2,7 @@
 // Date: 2012 // Sat Jul 23 08:17:35 2022
 // (C) OntoOO/ Dennis de Champeaux
 
-// static const int cut4Limit = 500; // 1-pivot prefix bound
-static const int cut4Limit = 1024*200; // 1-pivot prefix bound
-
+static const int cut4Limit = 1500; // 1-pivot prefix bound
 
 static void cut4c();
 // cut4 is doing 4-partitioning using 3 pivots
